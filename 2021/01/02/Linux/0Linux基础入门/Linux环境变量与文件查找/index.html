@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lemonforce.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="环境变量与文件查找Linux基础入门5 环境变量 环境变量的设置 环境变量的修改  变量">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux环境变量与文件查找">
+<meta property="og:url" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/index.html">
+<meta property="og:site_name" content="lemonforce">
+<meta property="og:description" content="环境变量与文件查找Linux基础入门5 环境变量 环境变量的设置 环境变量的修改  变量">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/document-uid735639labid60timestamp1532339240610.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/5-2.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/5-3.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/document-uid735639labid60timestamp1532339264870.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/document-uid735639labid60timestamp1532339293501.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583220161661">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/document-uid735639labid60timestamp1532339433567.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583223324878">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583224278229">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583224422523">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583225164807">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/document-uid735639labid60timestamp1532339453618.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583225846911">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583226161762">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583226577160">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583226847941">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/5-8.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583226953512">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583227074890">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583227330537">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/document-uid735639labid60timestamp1532339496430.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583227433812">
+<meta property="article:published_time" content="2021-01-02T08:52:04.000Z">
+<meta property="article:modified_time" content="2021-01-02T11:59:43.333Z">
+<meta property="article:author" content="lemonforce">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Linux基础入门">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/document-uid735639labid60timestamp1532339240610.png">
+
+<link rel="canonical" href="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux环境变量与文件查找 | lemonforce</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">lemonforce</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lemonforce">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lemonforce">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux环境变量与文件查找
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-01-02 16:52:04 / 修改时间：19:59:43" itemprop="dateCreated datePublished" datetime="2021-01-02T16:52:04+08:00">2021-01-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/" class="post-meta-item leancloud_visitors" data-flag-title="Linux环境变量与文件查找" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="环境变量与文件查找"><a href="#环境变量与文件查找" class="headerlink" title="环境变量与文件查找"></a>环境变量与文件查找</h1><p>Linux基础入门5</p>
+<h2 id="环境变量"><a href="#环境变量" class="headerlink" title="环境变量"></a>环境变量</h2><ul>
+<li>环境变量的设置</li>
+<li>环境变量的修改</li>
+</ul>
+<h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><p>要解释环境变量，得先明白变量是什么，准确的说应该是 Shell 变量，所谓变量就是计算机中用于记录一个值（不一定是数值，也可以是字符或字符串）的符号，而这些符号将用于不同的运算处理中。通常变量与值是一对一的关系，可以通过表达式读取它的值并赋值给其它变量，也可以直接指定数值赋值给任意变量。为了便于运算和处理，大部分的编程语言会区分变量的类型，用于分别记录数值、字符或者字符串等等数据类型。Shell 中的变量也基本如此，有不同类型（但不用专门指定类型名），可以参与运算，有作用域限定。</p>
+<blockquote>
+<p>变量的作用域即变量的有效范围（比如一个函数中、一个源文件中或者全局范围），在该范围内只能有一个同名变量。一旦离开则该变量无效，如同不存在这个变量一般。</p>
+</blockquote>
+<p>在 Shell 中如何创建一个变量，如何给变量赋值和如何读取变量的值呢？这部分内容会在 <a target="_blank" rel="noopener" href="https://www.lanqiao.cn/courses/944">高级 bash 脚本编程指南</a> 这门课中详细介绍，这里我简单举例说明一下：</p>
+<p>使用 <code>declare</code> 命令创建一个变量名为 tmp 的变量：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">declare</span> tmp</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>其实也可以不用 declare 预声明一个变量，直接即用即创建，这里只是告诉你 declare 的作用，这在创建其它指定类型的变量（如数组）时会用到。</p>
+</blockquote>
+<p>使用 <code>=</code> 号赋值运算符，将变量 tmp 赋值为 shiyanlou。注意，与其他语言不同的是， Shell 中的赋值操作，<code>=</code> 两边不可以输入空格，否则会报错。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 正确的赋值</span></span><br><span class="line">tmp=shiyanlou</span><br><span class="line"></span><br><span class="line"><span class="comment"># 错误的赋值</span></span><br><span class="line">tmp = shiyanlou</span><br></pre></td></tr></table></figure>
+<p>读取变量的值，使用 <code>echo</code> 命令和 <code>$</code> 符号（**$ 符号用于表示引用一个变量的值，初学者经常忘记输入**）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$tmp</span></span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/document-uid735639labid60timestamp1532339240610.png" alt="此处输入图片的描述"></p>
+<p><strong>注意：并不是任何形式的变量名都是可用的，变量名只能是英文字母、数字或者下划线，且不能以数字作为开头。</strong></p>
+<h3 id="环境变量-1"><a href="#环境变量-1" class="headerlink" title="环境变量"></a>环境变量</h3><p>简单理解了变量的概念，就很容易理解环境变量了。环境变量的作用域比自定义变量的要大，如 Shell 的环境变量作用于自身和它的子进程。在所有的 UNIX 和类 UNIX 系统中，每个进程都有其各自的环境变量设置，且默认情况下，当一个进程被创建时，除了创建过程中明确指定的话，它将继承其父进程的绝大部分环境设置。Shell 程序也作为一个进程运行在操作系统之上，而我们在 Shell 中运行的大部分命令都将以 Shell 的子进程的方式运行。</p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/5-2.png" alt="1"></p>
+<p>通常我们会涉及到的变量类型有三种：</p>
+<ul>
+<li>当前 Shell 进程私有用户自定义变量，如上面我们创建的 tmp 变量，只在当前 Shell 中有效。</li>
+<li>Shell 本身内建的变量。</li>
+<li>从自定义变量导出的环境变量。</li>
+</ul>
+<p>也有三个与上述三种环境变量相关的命令：<code>set</code>，<code>env</code>，<code>export</code>。这三个命令很相似，都是用于打印环境变量信息，区别在于涉及的变量范围不同。详见下表：</p>
+<table>
+<thead>
+<tr>
+<th>命 令</th>
+<th>说 明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>set</code></td>
+<td>显示当前 Shell 所有变量，包括其内建环境变量（与 Shell 外观等相关），用户自定义变量及导出的环境变量。</td>
+</tr>
+<tr>
+<td><code>env</code></td>
+<td>显示与当前用户相关的环境变量，还可以让命令在指定环境中运行。</td>
+</tr>
+<tr>
+<td><code>export</code></td>
+<td>显示从 Shell 中导出成环境变量的变量，也能通过它将自定义变量导出为环境变量。</td>
+</tr>
+</tbody></table>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/5-3.png" alt="1"></p>
+<p>你可以更直观的使用 <code>vimdiff</code> 工具比较一下它们之间的差别：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">temp=shiyanlou</span><br><span class="line"><span class="built_in">export</span> temp_env=shiyanlou</span><br><span class="line">env|sort&gt;env.txt</span><br><span class="line"><span class="built_in">export</span>|sort&gt;export.txt</span><br><span class="line"><span class="built_in">set</span>|sort&gt;set.txt</span><br></pre></td></tr></table></figure>
+<p>上述操作将命令输出通过管道 <code>|</code> 使用 <code>sort</code> 命令排序，再重定向到对象文本文件中。管道的概念后面我们会学到，现在你知道这是什么意思就行了。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vimdiff env.txt export.txt set.txt</span><br></pre></td></tr></table></figure>
+<p>使用 <code>vimdiff</code> 工具比较导出的几个文件的内容，退出 <code>vimdiff</code> 需要按下 Esc 后输入 <code>:q</code> 即可退出。</p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/document-uid735639labid60timestamp1532339264870.png" alt="1"></p>
+<p>关于哪些变量是环境变量，可以简单地理解成在当前进程的子进程有效则为环境变量，否则不是（有些人也将所有变量统称为环境变量，只是以全局环境变量和局部环境变量进行区分，我们只要理解它们的实质区别即可）。我们这里用 <code>export</code> 命令来体会一下，先在 Shell 中设置一个变量 <code>temp=shiyanlou</code>，然后再新创建一个子 Shell 查看 <code>temp</code> 变量的值：</p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/document-uid735639labid60timestamp1532339293501.png" alt="此处输入图片的描述"></p>
+<p><strong>注意：为了与普通变量区分，通常我们习惯将环境变量名设为大写。</strong></p>
+<h4 id="永久生效"><a href="#永久生效" class="headerlink" title="永久生效"></a>永久生效</h4><p>但是问题来了，当你关机后，或者关闭当前的 shell 之后，环境变量就没了啊。怎么才能让环境变量永久生效呢？</p>
+<p>按变量的生存周期来划分，Linux 变量可分为两类：</p>
+<ol>
+<li>永久的：需要修改配置文件，变量永久生效；</li>
+<li>临时的：使用 export 命令行声明即可，变量在关闭 shell 时失效。</li>
+</ol>
+<p>这里介绍两个重要文件 <code>/etc/bashrc</code>（有的 Linux 没有这个文件） 和 <code>/etc/profile</code> ，它们分别存放的是 shell 变量和环境变量。还有要注意区别的是每个用户目录下的一个隐藏文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># .profile 可以用 ls -a 查看</span></span><br><span class="line"><span class="built_in">cd</span> /home/shiyanlou</span><br><span class="line">ls -a</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583220161661" alt="图片描述"></p>
+<p>这个 .profile 只对当前用户永久生效。因为它保存在当前用户的 Home 目录下，当切换用户时，工作目录可能一并被切换到对应的目录中，这个文件就无法生效。而写在 <code>/etc/profile</code> 里面的是对所有用户永久生效，所以如果想要添加一个永久生效的环境变量，只需要打开 <code>/etc/profile</code>，在最后加上你想添加的环境变量就好啦。</p>
+<h3 id="命令的查找路径与顺序"><a href="#命令的查找路径与顺序" class="headerlink" title="命令的查找路径与顺序"></a>命令的查找路径与顺序</h3><p>你可能很早之前就有疑问，我们在 Shell 中输入一个命令，Shell 是怎么知道去哪找到这个命令然后执行的呢？这是通过环境变量 <code>PATH</code> 来进行搜索的，熟悉 Windows 的用户可能知道 Windows 中的也是有这么一个 PATH 环境变量。这个 <code>PATH</code> 里面就保存了 Shell 中执行的命令的搜索路径。</p>
+<p>查看 <code>PATH</code> 环境变量的内容：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$PATH</span></span><br></pre></td></tr></table></figure>
+<p>默认情况下你会看到如下输出：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/<span class="built_in">local</span>/sbin:/usr/<span class="built_in">local</span>/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/<span class="built_in">local</span>/games</span><br></pre></td></tr></table></figure>
+<p>如果你还记得 Linux 目录结构那一节的内容，你就应该知道上面这些目录下放的是哪一类文件了。通常这一类目录下放的都是可执行文件，当我们在 Shell 中执行一个命令时，系统就会按照 PATH 中设定的路径按照顺序依次到目录中去查找，如果存在同名的命令，则执行先找到的那个。</p>
+<blockquote>
+<p>下面我们将练习创建一个最简单的可执行 Shell 脚本和一个使用 C 语言创建的“ hello world ”程序，如果这两部分内容你之前没有学习过，那么你可以进行一个入门学习：</p>
+</blockquote>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.lanqiao.cn/courses/57">C 语言入门教程</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.lanqiao.cn/courses/5">高级 Bash 脚本编程指南</a></li>
+<li><a target="_blank" rel="noopener" href="http://bash.cyberciti.biz/guide/Main_Page">Linux Shell Scripting Tutorial (LSST) v2.0</a></li>
+</ul>
+<p>创建一个 Shell 脚本文件，你可以使用 gedit，vim，sublime 等工具编辑。如果你是直接复制的话，建议使用 gedit 或者 sublime，否则可能导致代码缩进混乱。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /home/shiyanlou</span><br><span class="line">touch hello_shell.sh</span><br><span class="line">gedit hello_shell.sh</span><br></pre></td></tr></table></figure>
+<p>在脚本中添加如下内容，保存并退出。</p>
+<p><strong>注意不要省掉第一行，这不是注释，有用户反映有语法错误，就是因为没有了第一行。</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> ((i=0; i&lt;10; i++));<span class="keyword">do</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">&quot;hello shell&quot;</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">exit</span> 0</span><br></pre></td></tr></table></figure>
+<p>为文件添加可执行权限，否则执行会报错没有权限：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod 755 hello_shell.sh</span><br></pre></td></tr></table></figure>
+<p>执行脚本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /home/shiyanlou</span><br><span class="line">./hello_shell.sh</span><br></pre></td></tr></table></figure>
+<p>创建一个 C 语言 <code>hello world</code> 程序：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /home/shiyanlou</span><br><span class="line">gedit hello_world.c</span><br></pre></td></tr></table></figure>
+<p>输入如下内容，同样不能省略第一行。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;hello world!\n&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>保存后使用 gcc 生成可执行文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gcc -o hello_world hello_world.c</span><br></pre></td></tr></table></figure>
+<p><strong>gcc 生成二进制文件默认具有可执行权限，不需要修改。</strong></p>
+<p>在 <code>/home/shiyanlou</code> 家目录创建一个 <code>mybin</code> 目录，并将上述 <code>hello_shell.sh</code> 和 <code>hello_world</code> 文件移动到其中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /home/shiyanlou</span><br><span class="line">mkdir mybin</span><br><span class="line">mv hello_shell.sh hello_world mybin/</span><br></pre></td></tr></table></figure>
+<p>现在你可以在 <code>mybin</code> 目录中分别运行你刚刚创建的两个程序：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> mybin</span><br><span class="line">./hello_shell.sh</span><br><span class="line">./hello_world</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/document-uid735639labid60timestamp1532339433567.png" alt="此处输入图片的描述"></p>
+<p>回到上一级目录，也就是 <code>shiyanlou</code> 家目录，当再想运行那两个程序时，会发现提示命令找不到，除非加上命令的完整路径，但那样很不方便，如何做到像使用系统命令一样执行自己创建的脚本文件或者程序呢？那就要将命令所在路径添加到 <code>PATH</code> 环境变量了。</p>
+<h3 id="添加自定义路径到“-PATH-”环境变量"><a href="#添加自定义路径到“-PATH-”环境变量" class="headerlink" title="添加自定义路径到“ PATH ”环境变量"></a>添加自定义路径到“ PATH ”环境变量</h3><p>在前面我们应该注意到 <code>PATH</code> 里面的路径是以 <code>:</code> 作为分割符的，所以我们可以这样添加自定义路径：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PATH=<span class="variable">$PATH</span>:/home/shiyanlou/mybin</span><br></pre></td></tr></table></figure>
+<p><strong>注意这里一定要使用绝对路径。</strong></p>
+<p>现在你就可以在任意目录执行那两个命令了（注意需要去掉前面的 <code>./</code>）。你可能会意识到这样还并没有很好的解决问题，因为我给 PATH 环境变量追加了一个路径，它也只是在当前 Shell 有效，我一旦退出终端，再打开就会发现又失效了。有没有方法让添加的环境变量全局有效？或者每次启动 Shell 时自动执行上面添加自定义路径到 PATH 的命令？下面我们就来说说后一种方式——让它自动执行。</p>
+<p>在每个用户的 home 目录中有一个 Shell 每次启动时会默认执行一个配置脚本，以初始化环境，包括添加一些用户自定义环境变量等等。实验楼的环境使用的 Shell 是 zsh，它的配置文件是 <code>.zshrc</code>，相应的如果使用的 Shell 是 Bash，则配置文件为 <code>.bashrc</code>。它们在 <code>etc</code> 下还都有一个或多个全局的配置文件，不过我们一般只修改用户目录下的配置文件。Shell 的种类有很多，可以使用 <code>cat /etc/shells</code> 命令查看当前系统已安装的 Shell。</p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583223324878" alt="图片描述"></p>
+<p>我们可以简单地使用下面命令直接添加内容到 <code>.zshrc</code> 中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;PATH=<span class="variable">$PATH</span>:/home/shiyanlou/mybin&quot;</span> &gt;&gt; .zshrc</span><br></pre></td></tr></table></figure>
+<p><strong>上述命令中 <code>&gt;&gt;</code> 表示将标准输出以追加的方式重定向到一个文件中，注意前面用到的 <code>&gt;</code> 是以覆盖的方式重定向到一个文件中，使用的时候一定要注意分辨。在指定文件不存在的情况下都会创建新的文件。</strong></p>
+<h3 id="修改和删除已有变量"><a href="#修改和删除已有变量" class="headerlink" title="修改和删除已有变量"></a>修改和删除已有变量</h3><h4 id="变量修改"><a href="#变量修改" class="headerlink" title="变量修改"></a>变量修改</h4><p>变量的修改有以下几种方式：</p>
+<table>
+<thead>
+<tr>
+<th>变量设置方式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>$&#123;变量名#匹配字串&#125;</code></td>
+<td>从头向后开始匹配，删除符合匹配字串的最短数据</td>
+</tr>
+<tr>
+<td><code>$&#123;变量名##匹配字串&#125;</code></td>
+<td>从头向后开始匹配，删除符合匹配字串的最长数据</td>
+</tr>
+<tr>
+<td><code>$&#123;变量名%匹配字串&#125;</code></td>
+<td>从尾向前开始匹配，删除符合匹配字串的最短数据</td>
+</tr>
+<tr>
+<td><code>$&#123;变量名%%匹配字串&#125;</code></td>
+<td>从尾向前开始匹配，删除符合匹配字串的最长数据</td>
+</tr>
+<tr>
+<td><code>$&#123;变量名/旧的字串/新的字串&#125;</code></td>
+<td>将符合旧字串的第一个字串替换为新的字串</td>
+</tr>
+<tr>
+<td><code>$&#123;变量名//旧的字串/新的字串&#125;</code></td>
+<td>将符合旧字串的全部字串替换为新的字串</td>
+</tr>
+</tbody></table>
+<p>比如我们可以修改前面添加到 PATH 的环境变量，将添加的 mybin 目录从环境变量里删除。为了避免操作失误导致命令找不到，我们先将 PATH 赋值给一个新的自定义变量 mypath：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">mypath=<span class="variable">$PATH</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$mypath</span></span><br><span class="line">mypath=<span class="variable">$&#123;mypath%/home/shiyanlou/mybin&#125;</span></span><br><span class="line"><span class="comment"># 或使用通配符 * 表示任意多个任意字符</span></span><br><span class="line">mypath=<span class="variable">$&#123;mypath%*/mybin&#125;</span></span><br></pre></td></tr></table></figure>
+<p>可以看到路径已经不存在了。</p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583224278229" alt="图片描述"></p>
+<h4 id="变量删除"><a href="#变量删除" class="headerlink" title="变量删除"></a>变量删除</h4><p>可以使用 <code>unset</code> 命令删除一个环境变量：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">unset</span> mypath</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583224422523" alt="图片描述"></p>
+<h3 id="让环境变量立即生效"><a href="#让环境变量立即生效" class="headerlink" title="让环境变量立即生效"></a>让环境变量立即生效</h3><p>前面我们在 Shell 中修改了一个配置脚本文件之后（比如 zsh 的配置文件 home 目录下的 <code>.zshrc</code>），每次都要退出终端重新打开甚至重启主机之后其才能生效，很是麻烦，我们可以使用 <code>source</code> 命令来让其立即生效，如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /home/shiyanlou</span><br><span class="line"><span class="built_in">source</span> .zshrc</span><br></pre></td></tr></table></figure>
+<p><code>source</code> 命令还有一个别名就是 <code>.</code>，上面的命令如果替换成 <code>.</code> 的方式就该是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">. ./.zshrc</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583225164807" alt="图片描述"></p>
+<p>在使用 <code>.</code> 的时候，需要注意与表示当前路径的那个点区分开。</p>
+<p>注意第一个点后面有一个空格，而且后面的文件必须指定完整的绝对或相对路径名，<code>source</code> 则不需要。</p>
+<h2 id="搜索文件"><a href="#搜索文件" class="headerlink" title="搜索文件"></a>搜索文件</h2><p>与搜索相关的命令常用的有 <code>whereis</code>，<code>which</code>，<code>find</code> 和 <code>locate</code>。</p>
+<ul>
+<li><code>whereis</code> 简单快速</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">whereis who</span><br><span class="line">whereis find</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/document-uid735639labid60timestamp1532339453618.png" alt="此处输入图片的描述"></p>
+<p>你会看到 <code>whereis find</code> 找到了三个路径，两个可执行文件路径和一个 man 在线帮助文件所在路径，这个搜索很快，因为它并没有从硬盘中依次查找，而是直接从数据库中查询。</p>
+<p><code>whereis</code> 只能搜索二进制文件（<code>-b</code>），man 帮助文件（<code>-m</code>）和源代码文件（<code>-s</code>）。如果想要获得更全面的搜索结果可以使用 <code>locate</code> 命令。</p>
+<ul>
+<li><code>locate</code> 快而全</li>
+</ul>
+<p>使用 <code>locate</code> 命令查找文件也不会遍历硬盘，它通过查询 <code>/var/lib/mlocate/mlocate.db</code> 数据库来检索信息。不过这个数据库也不是实时更新的，系统会使用定时任务每天自动执行 <code>updatedb</code> 命令来更新数据库。所以有时候你刚添加的文件，它可能会找不到，需要手动执行一次 <code>updatedb</code> 命令（在我们的环境中必须先执行一次该命令）。注意这个命令也不是内置的命令，在部分环境中需要手动安装，然后执行更新。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install locate</span><br><span class="line">sudo updatedb</span><br></pre></td></tr></table></figure>
+<p>它可以用来查找指定目录下的不同文件类型，如查找 <code>/etc</code> 下所有以 sh 开头的文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">locate /etc/sh</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>注意，它不只是在 /etc 目录下查找，还会自动递归子目录进行查找。</strong></p>
+</blockquote>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583225846911" alt="图片描述"></p>
+<p>查找 <code>/usr/share/</code> 下所有 jpg 文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">locate /usr/share/\*.jpg</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>注意要添加 <code>\*</code> 号前面的反斜杠转义，否则会无法找到。</strong></p>
+</blockquote>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583226161762" alt="图片描述"></p>
+<p>如果想只统计数目可以加上 <code>-c</code> 参数，<code>-i</code> 参数可以忽略大小写进行查找，<code>whereis</code> 的 <code>-b</code>、<code>-m</code>、<code>-s</code> 同样可以使用。</p>
+<ul>
+<li><code>which</code> 小而精</li>
+</ul>
+<p><code>which</code> 本身是 Shell 内建的一个命令，我们通常使用 <code>which</code> 来确定是否安装了某个指定的程序，因为它只从 <code>PATH</code> 环境变量指定的路径中去搜索命令并且返回第一个搜索到的结果。也就是说，我们可以看到某个系统命令是否存在以及执行的到底是哪一个地方的命令。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">which</span> man</span><br><span class="line"><span class="built_in">which</span> nginx</span><br><span class="line"><span class="built_in">which</span> ping</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583226577160" alt="图片描述"></p>
+<ul>
+<li><code>find</code> 精而细</li>
+</ul>
+<p><code>find</code> 应该是这几个命令中最强大的了，它不但可以通过文件类型、文件名进行查找而且可以根据文件的属性（如文件的时间戳，文件的权限等）进行搜索。<code>find</code> 命令强大到，要把它讲明白至少需要单独好几节课程才行，我们这里只介绍一些常用的内容。</p>
+<p>这条命令表示去 <code>/etc/</code> 目录下面 ，搜索名字叫做 interfaces 的文件或者目录。这是 <code>find</code> 命令最常见的格式，千万记住 <code>find</code> 的第一个参数是要搜索的地方。命令前面加上 <code>sudo</code> 是因为 shiyanlou 只是普通用户，对 <code>/etc</code> 目录下的很多文件都没有访问的权限，如果是 root 用户则不用使用。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo find /etc/ -name interfaces</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583226847941" alt="图片描述"></p>
+<blockquote>
+<p><strong>注意 find 命令的路径是作为第一个参数的， 基本命令格式为 find [path][option] [action] 。</strong></p>
+</blockquote>
+<p>与时间相关的命令参数：</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-atime</code></td>
+<td>最后访问时间</td>
+</tr>
+<tr>
+<td><code>-ctime</code></td>
+<td>最后修改文件内容的时间</td>
+</tr>
+<tr>
+<td><code>-mtime</code></td>
+<td>最后修改文件属性的时间</td>
+</tr>
+</tbody></table>
+<p>下面以 <code>-mtime</code> 参数举例：</p>
+<ul>
+<li><code>-mtime n</code>：n 为数字，表示为在 n 天之前的“一天之内”修改过的文件</li>
+<li><code>-mtime +n</code>：列出在 n 天之前（不包含 n 天本身）被修改过的文件</li>
+<li><code>-mtime -n</code>：列出在 n 天之内（包含 n 天本身）被修改过的文件</li>
+<li><code>-newer file</code>：file 为一个已存在的文件，列出比 file 还要新的文件名</li>
+</ul>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/5-8.png" alt="1"></p>
+<p>列出 home 目录中，当天（24 小时之内）有改动的文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find ~ -mtime 0</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583226953512" alt="图片描述"></p>
+<p>列出用户家目录下比 /etc 目录新的文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find ~ -newer /etc</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583227074890" alt="图片描述"></p>
+<h2 id="娱乐"><a href="#娱乐" class="headerlink" title="娱乐"></a>娱乐</h2><h4 id="轻松一下"><a href="#轻松一下" class="headerlink" title="轻松一下"></a>轻松一下</h4><p>《黑客帝国》电影里满屏幕代码的“数字雨”，在 Linux 里面你也可以轻松实现这样的效果，你只需要一个命令 <code>cmatrix</code> 。</p>
+<p>需要先安装，因为 Ubuntu 没有预装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line">sudo apt-get install cmatrix</span><br></pre></td></tr></table></figure>
+<p>装好之后先不要急着执行，为了看到更好的效果，我们需要先修改终端的主题配色，在终端上面菜单栏中找到[首选项]修改，修改颜色预设为黑底绿字。</p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583227330537" alt="图片描述"></p>
+<p>然后输入 <code>cmatrix</code> 开始运行。</p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/document-uid735639labid60timestamp1532339496430.png" alt="此处输入图片的描述"></p>
+<p>按下 <code>F11</code> 可以全屏显示。</p>
+<p>还可以改变代码的颜色：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmatrix -C red</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/uid871732-20200303-1583227433812" alt="图片描述"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" rel="tag"># Linux基础入门</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%E5%8F%8A%E6%96%87%E4%BB%B6%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/" rel="prev" title="Linux目录结构及文件基本操作">
+      <i class="fa fa-chevron-left"></i> Linux目录结构及文件基本操作
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/" rel="next" title="Linux文件打包与解压缩">
+      Linux文件打包与解压缩 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE"><span class="nav-number">1.</span> <span class="nav-text">环境变量与文件查找</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-number">1.1.</span> <span class="nav-text">环境变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E9%87%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F-1"><span class="nav-number">1.1.2.</span> <span class="nav-text">环境变量</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B0%B8%E4%B9%85%E7%94%9F%E6%95%88"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">永久生效</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E7%9A%84%E6%9F%A5%E6%89%BE%E8%B7%AF%E5%BE%84%E4%B8%8E%E9%A1%BA%E5%BA%8F"><span class="nav-number">1.1.3.</span> <span class="nav-text">命令的查找路径与顺序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E8%87%AA%E5%AE%9A%E4%B9%89%E8%B7%AF%E5%BE%84%E5%88%B0%E2%80%9C-PATH-%E2%80%9D%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-number">1.1.4.</span> <span class="nav-text">添加自定义路径到“ PATH ”环境变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E5%92%8C%E5%88%A0%E9%99%A4%E5%B7%B2%E6%9C%89%E5%8F%98%E9%87%8F"><span class="nav-number">1.1.5.</span> <span class="nav-text">修改和删除已有变量</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E4%BF%AE%E6%94%B9"><span class="nav-number">1.1.5.1.</span> <span class="nav-text">变量修改</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%98%E9%87%8F%E5%88%A0%E9%99%A4"><span class="nav-number">1.1.5.2.</span> <span class="nav-text">变量删除</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A9%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E7%AB%8B%E5%8D%B3%E7%94%9F%E6%95%88"><span class="nav-number">1.1.6.</span> <span class="nav-text">让环境变量立即生效</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%90%9C%E7%B4%A2%E6%96%87%E4%BB%B6"><span class="nav-number">1.2.</span> <span class="nav-text">搜索文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A8%B1%E4%B9%90"><span class="nav-number">1.3.</span> <span class="nav-text">娱乐</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%BB%E6%9D%BE%E4%B8%80%E4%B8%8B"><span class="nav-number">1.3.0.1.</span> <span class="nav-text">轻松一下</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lemonforce</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonforce</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/three-waves.min.js"></script>
+    <script defer src="/lib/three/canvas_sphere.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'gzXD9zEDA40Tphr5SR3SdW1Q-gzGzoHsz',
+      appKey     : 'OhkBCtuVUlWsxS1Bm4jQVLgX',
+      placeholder: "有啥想说的，尽情留言",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

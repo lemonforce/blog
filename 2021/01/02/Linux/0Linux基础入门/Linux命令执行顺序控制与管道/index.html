@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lemonforce.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="命令执行顺序控制与管道Linux基础入门10 命令执行顺序的控制通常情况下，我们每次只能在终端输入一条命令，按下回车执行，执行完成后，我们再输入第二条命令，然后再按回车执行。当有时候我们会一次输入多条命令，这个时候的执行过程又是如何的呢？下面我们将为大家详细讲解下命令的执行顺序的控制问题。 顺序执行多条命令">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux命令执行顺序控制与管道">
+<meta property="og:url" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/index.html">
+<meta property="og:site_name" content="lemonforce">
+<meta property="og:description" content="命令执行顺序控制与管道Linux基础入门10 命令执行顺序的控制通常情况下，我们每次只能在终端输入一条命令，按下回车执行，执行完成后，我们再输入第二条命令，然后再按回车执行。当有时候我们会一次输入多条命令，这个时候的执行过程又是如何的呢？下面我们将为大家详细讲解下命令的执行顺序的控制问题。 顺序执行多条命令">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid1labid63timestamp1544148440172.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid735639labid63timestamp1532414664955.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/8-3.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid735639labid63timestamp1532414685006.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid735639labid63timestamp1532414709836.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid735639labid63timestamp1532414725827.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid735639labid63timestamp1532414808838.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid600404labid6125timestamp1523946094712.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid735639labid63timestamp1532414849333.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/linus.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/1550043520959.png">
+<meta property="article:published_time" content="2021-01-02T10:38:47.000Z">
+<meta property="article:modified_time" content="2021-01-02T11:56:46.214Z">
+<meta property="article:author" content="lemonforce">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Linux基础入门">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid1labid63timestamp1544148440172.png">
+
+<link rel="canonical" href="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux命令执行顺序控制与管道 | lemonforce</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">lemonforce</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lemonforce">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lemonforce">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux命令执行顺序控制与管道
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-01-02 18:38:47 / 修改时间：19:56:46" itemprop="dateCreated datePublished" datetime="2021-01-02T18:38:47+08:00">2021-01-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/" class="post-meta-item leancloud_visitors" data-flag-title="Linux命令执行顺序控制与管道" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="命令执行顺序控制与管道"><a href="#命令执行顺序控制与管道" class="headerlink" title="命令执行顺序控制与管道"></a>命令执行顺序控制与管道</h1><p>Linux基础入门10</p>
+<h2 id="命令执行顺序的控制"><a href="#命令执行顺序的控制" class="headerlink" title="命令执行顺序的控制"></a>命令执行顺序的控制</h2><p>通常情况下，我们每次只能在终端输入一条命令，按下回车执行，执行完成后，我们再输入第二条命令，然后再按回车执行。当有时候我们会一次输入多条命令，这个时候的执行过程又是如何的呢？下面我们将为大家详细讲解下命令的执行顺序的控制问题。</p>
+<h3 id="顺序执行多条命令"><a href="#顺序执行多条命令" class="headerlink" title="顺序执行多条命令"></a>顺序执行多条命令</h3><p>当我们需要使用 <code>apt-get</code> 安装一个软件，然后安装完成后立即运行安装的软件或命令工具，又恰巧你的主机才更换的软件源还没有更新软件列表（比如之前我们的环境中，每次重新开始实验就得 <code>sudo apt-get update</code>，否则可能会报错提示 404），那么你可能会有如下一系列操作：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update</span><br><span class="line"><span class="comment"># 等待执行完毕，然后输入下面的命令</span></span><br><span class="line">sudo apt-get install some-tool <span class="comment"># 这里 some-tool 需要替换成具体的软件包</span></span><br><span class="line"><span class="comment"># 等待安装完毕，然后输入软件包名称执行</span></span><br><span class="line">some-tool</span><br></pre></td></tr></table></figure>
+<p>这时你可能就会想：要是我可以一次性输入完，让它自己去依次执行各命令就好了，这就是我们这一小节要解决的问题。</p>
+<p>简单的顺序执行你可以使用 <code>;</code> 来完成，比如上述操作你可以：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update;sudo apt-get install some-tool;some-tool <span class="comment"># 让它自己运行</span></span><br></pre></td></tr></table></figure>
+<h3 id="有选择的执行命令"><a href="#有选择的执行命令" class="headerlink" title="有选择的执行命令"></a>有选择的执行命令</h3><p>关于上面的操作，不知你有没有思考过一个问题，如果我们在让它自动顺序执行命令时，前面的命令执行不成功，而后面的命令又依赖于上一条命令的结果，那么就会造成花了时间，最终却得到一个错误的结果，而且有时候直观的看你还无法判断结果是否正确。那么我们需要能够有选择性的来执行命令，比如上一条命令执行成功才继续下一条，或者不成功又该做出其它什么处理，比如我们使用 <code>which</code> 来查找是否安装某个命令，如果找到就执行该命令，否则什么也不做，虽然这个操作没有什么实际意义，但可帮你更好的理解一些概念：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">which</span> cowsay&gt;/dev/null &amp;&amp; cowsay -f head-in ohch~</span><br></pre></td></tr></table></figure>
+<p>你如果没有安装 <code>cowsay</code>，你可以先执行一次上述命令，你会发现什么也没发生，你再安装好之后你再执行一次上述命令，你也会发现一些惊喜。</p>
+<p>上面的 <code>&amp;&amp;</code> 就是用来实现选择性执行的，它表示如果前面的命令执行结果（不是表示终端输出的内容，而是表示命令执行状态的结果）返回 0 则执行后面的，否则不执行，你可以从 <code>$?</code> 环境变量获取上一次命令的返回结果：</p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid1labid63timestamp1544148440172.png" alt="此处输入图片的描述"></p>
+<p>学习过 C 语言的用户应该知道在 C 语言里面 <code>&amp;&amp;</code> 表示逻辑与，而且还有一个 <code>||</code> 表示逻辑或，同样 Shell 也有一个 <code>||</code>，它们的区别就在于，shell 中的这两个符号除了也可用于表示逻辑与和或之外，就是可以实现这里的命令执行顺序的简单控制。<code>||</code> 在这里就是与 <code>&amp;&amp;</code> 相反的控制效果，当上一条命令执行结果为 <code>≠0(\$?≠0)</code> 时则执行它后面的命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">which</span> cowsay&gt;/dev/null || <span class="built_in">echo</span> <span class="string">&quot;cowsay has not been install, please run &#x27;sudo apt-get install cowsay&#x27; to install&quot;</span></span><br></pre></td></tr></table></figure>
+<p>除了上述基本的使用之外，我们还可以结合着 <code>&amp;&amp;</code> 和 <code>||</code> 来实现一些操作，比如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">which</span> cowsay&gt;/dev/null &amp;&amp; <span class="built_in">echo</span> <span class="string">&quot;exist&quot;</span> || <span class="built_in">echo</span> <span class="string">&quot;not exist&quot;</span></span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid735639labid63timestamp1532414664955.png" alt="此处输入图片的描述"></p>
+<p>我画个流程图来解释一下上面的流程：</p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/8-3.png" alt="1"></p>
+<h3 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h3><p>上面我们讲到将 <code>&amp;&amp;</code> 和 <code>||</code> 结合起来使用，那么是否以任意顺序都行？比如上面我们是 <code>&amp;&amp;</code> 在前 <code>||</code> 在后，反过来可以么？会不会有问题？</p>
+<h2 id="管道"><a href="#管道" class="headerlink" title="管道"></a>管道</h2><p>管道是一种通信机制，通常用于进程间的通信（也可通过 socket 进行网络通信），它表现出来的形式就是将前面每一个进程的输出（stdout）直接作为下一个进程的输入（stdin）。</p>
+<p>管道又分为匿名管道和具名管道（这里将不会讨论在源程序中使用系统调用创建并使用管道的情况，它与命令行的管道在内核中实际都是采用相同的机制）。我们在使用一些过滤程序时经常会用到的就是匿名管道，在命令行中由 <code>|</code> 分隔符表示，<code>|</code> 在前面的内容中我们已经多次使用到了。具名管道简单的说就是有名字的管道，通常只会在源程序中用到具名管道。下面我们就将通过一些常用的可以使用管道的过滤程序来帮助你熟练管道的使用。</p>
+<h3 id="试用"><a href="#试用" class="headerlink" title="试用"></a>试用</h3><p>先试用一下管道，比如查看 <code>/etc</code> 目录下有哪些文件和目录，使用 <code>ls</code> 命令来查看：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -al /etc</span><br></pre></td></tr></table></figure>
+<p>有太多内容，屏幕不能完全显示，这时候可以使用滚动条或快捷键滚动窗口来查看。不过这时候可以使用管道：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -al /etc | less</span><br></pre></td></tr></table></figure>
+<p>通过管道将前一个命令(<code>ls</code>)的输出作为下一个命令(<code>less</code>)的输入，然后就可以一行一行地看。</p>
+<h3 id="cut-命令，打印每一行的某一字段"><a href="#cut-命令，打印每一行的某一字段" class="headerlink" title="cut 命令，打印每一行的某一字段"></a>cut 命令，打印每一行的某一字段</h3><p>打印 <code>/etc/passwd</code> 文件中以 <code>:</code> 为分隔符的第 1 个字段和第 6 个字段分别表示用户名和其家目录：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cut &#x2F;etc&#x2F;passwd -d &#39;:&#39; -f 1,6</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid735639labid63timestamp1532414685006.png" alt="此处输入图片的描述"></p>
+<p>打印 <code>/etc/passwd</code> 文件中每一行的前 N 个字符：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 前五个（包含第五个）</span></span><br><span class="line">cut /etc/passwd -c -5</span><br><span class="line"><span class="comment"># 前五个之后的（包含第五个）</span></span><br><span class="line">cut /etc/passwd -c 5-</span><br><span class="line"><span class="comment"># 第五个</span></span><br><span class="line">cut /etc/passwd -c 5</span><br><span class="line"><span class="comment"># 2 到 5 之间的（包含第五个）</span></span><br><span class="line">cut /etc/passwd -c 2-5</span><br></pre></td></tr></table></figure>
+<h3 id="grep-命令，在文本中或-stdin-中查找匹配字符串"><a href="#grep-命令，在文本中或-stdin-中查找匹配字符串" class="headerlink" title="grep 命令，在文本中或 stdin 中查找匹配字符串"></a>grep 命令，在文本中或 stdin 中查找匹配字符串</h3><p><code>grep</code> 命令是很强大的，也是相当常用的一个命令，它结合正则表达式可以实现很复杂却很高效的匹配和查找，不过在学习正则表达式之前，这里介绍它简单的使用，而关于正则表达式后面将会有单独一小节介绍到时会再继续学习 <code>grep</code> 命令和其他一些命令。</p>
+<p><code>grep</code> 命令的一般形式为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep [命令选项]... 用于匹配的表达式 [文件]...</span><br></pre></td></tr></table></figure>
+<p>还是先体验一下，我们搜索<code>/home/shiyanlou</code>目录下所有包含”shiyanlou”的文本文件，并显示出现在文本中的行号：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep -rnI <span class="string">&quot;shiyanlou&quot;</span> ~</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid735639labid63timestamp1532414709836.png" alt="此处输入图片的描述"></p>
+<p><code>-r</code> 参数表示递归搜索子目录中的文件，<code>-n</code> 表示打印匹配项行号，<code>-I</code> 表示忽略二进制文件。这个操作实际没有多大意义，但可以感受到 <code>grep</code> 命令的强大与实用。</p>
+<p>当然也可以在匹配字段中使用正则表达式，下面简单的演示：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看环境变量中以 &quot;yanlou&quot; 结尾的字符串</span></span><br><span class="line"><span class="built_in">export</span> | grep <span class="string">&quot;.*yanlou$&quot;</span></span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid735639labid63timestamp1532414725827.png" alt="此处输入图片的描述"></p>
+<p>其中<code>$</code>就表示一行的末尾。</p>
+<h3 id="wc-命令，简单小巧的计数工具"><a href="#wc-命令，简单小巧的计数工具" class="headerlink" title="wc 命令，简单小巧的计数工具"></a>wc 命令，简单小巧的计数工具</h3><p>wc 命令用于统计并输出一个文件中行、单词和字节的数目，比如输出 <code>/etc/passwd</code> 文件的统计信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wc /etc/passwd</span><br></pre></td></tr></table></figure>
+<p>分别只输出行数、单词数、字节数、字符数和输入文本中最长一行的字节数：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 行数</span></span><br><span class="line">wc -l /etc/passwd</span><br><span class="line"><span class="comment"># 单词数</span></span><br><span class="line">wc -w /etc/passwd</span><br><span class="line"><span class="comment"># 字节数</span></span><br><span class="line">wc -c /etc/passwd</span><br><span class="line"><span class="comment"># 字符数</span></span><br><span class="line">wc -m /etc/passwd</span><br><span class="line"><span class="comment"># 最长行字节数</span></span><br><span class="line">wc -L /etc/passwd</span><br></pre></td></tr></table></figure>
+<p><strong>注意：对于西文字符来说，一个字符就是一个字节，但对于中文字符一个汉字是大于 2 个字节的，具体数目是由字符编码决定的。</strong></p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid735639labid63timestamp1532414808838.png" alt="此处输入图片的描述"></p>
+<p>再来结合管道来操作一下，下面统计 /etc 下面所有目录数：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -dl /etc/*/ | wc -l</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid600404labid6125timestamp1523946094712.png" alt="此处输入图片的描述"></p>
+<h3 id="sort-排序命令"><a href="#sort-排序命令" class="headerlink" title="sort 排序命令"></a>sort 排序命令</h3><p>这个命令前面我们也是用过多次，功能很简单就是将输入按照一定方式排序，然后再输出，它支持的排序有按字典排序，数字排序，按月份排序，随机排序，反转排序，指定特定字段进行排序等等。</p>
+<p>默认为字典排序：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/passwd | sort</span><br></pre></td></tr></table></figure>
+<p>反转排序：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/passwd | sort -r</span><br></pre></td></tr></table></figure>
+<p>按特定字段排序：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/passwd | sort -t<span class="string">&#x27;:&#x27;</span> -k 3</span><br></pre></td></tr></table></figure>
+<p>上面的<code>-t</code>参数用于指定字段的分隔符，这里是以”:”作为分隔符；<code>-k 字段号</code>用于指定对哪一个字段进行排序。这里<code>/etc/passwd</code>文件的第三个字段为数字，默认情况下是以字典序排序的，如果要按照数字排序就要加上<code>-n</code>参数：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/passwd | sort -t<span class="string">&#x27;:&#x27;</span> -k 3 -n</span><br></pre></td></tr></table></figure>
+<p>注意观察第二个冒号后的数字： <img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/document-uid735639labid63timestamp1532414849333.png" alt="此处输入图片的描述"></p>
+<h3 id="uniq-去重命令"><a href="#uniq-去重命令" class="headerlink" title="uniq 去重命令"></a>uniq 去重命令</h3><p><code>uniq</code> 命令可以用于过滤或者输出重复行。</p>
+<ul>
+<li>过滤重复行</li>
+</ul>
+<p>我们可以使用 <code>history</code> 命令查看最近执行过的命令（实际为读取 <code>$&#123;SHELL&#125;_history</code> 文件，如我们环境中的 <code>.zsh_history</code> 文件），不过你可能只想查看使用了哪个命令而不需要知道具体干了什么，那么你可能就会要想去掉命令后面的参数然后去掉重复的命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">history</span> | cut -c 8- | cut -d <span class="string">&#x27; &#x27;</span> -f 1 | uniq</span><br></pre></td></tr></table></figure>
+<p>然后经过层层过滤，你会发现确是只输出了执行的命令那一列，不过去重效果好像不明显，仔细看你会发现它确实去重了，只是不那么明显，之所以不明显是因为 <code>uniq</code> 命令只能去连续重复的行，不是全文去重，所以要达到预期效果，我们先排序：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">history</span> | cut -c 8- | cut -d <span class="string">&#x27; &#x27;</span> -f 1 | sort | uniq</span><br><span class="line"><span class="comment"># 或者</span></span><br><span class="line"><span class="built_in">history</span> | cut -c 8- | cut -d <span class="string">&#x27; &#x27;</span> -f 1 | sort -u</span><br></pre></td></tr></table></figure>
+<p>这就是 Linux/UNIX 哲学吸引人的地方，大繁至简，一个命令只干一件事却能干到最好。</p>
+<ul>
+<li>输出重复行</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 输出重复过的行（重复的只输出一个）及重复次数</span></span><br><span class="line"><span class="built_in">history</span> | cut -c 8- | cut -d <span class="string">&#x27; &#x27;</span> -f 1 | sort | uniq -dc</span><br><span class="line"><span class="comment"># 输出所有重复的行</span></span><br><span class="line"><span class="built_in">history</span> | cut -c 8- | cut -d <span class="string">&#x27; &#x27;</span> -f 1 | sort | uniq -D</span><br></pre></td></tr></table></figure>
+<p>文本处理命令还有很多，下一节将继续介绍一些常用的文本处理的命令。</p>
+<h4 id="轻松一下"><a href="#轻松一下" class="headerlink" title="轻松一下"></a>轻松一下</h4><p>使用以前介绍过的方法，安装<code>aview</code>和<code>imagemagick</code>，然后用<code>asciiview</code>命令显示图片，使用方法可以用 man 命令查看。</p>
+<p>Linus 大神的照片地址 <a target="_blank" rel="noopener" href="https://labfile.oss.aliyuncs.com/courses/1/Linus.png">https://labfile.oss.aliyuncs.com/courses/1/Linus.png</a></p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/linus.png" alt="1"></p>
+<p>执行以下命令安装工具包并下载图片：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo apt update</span><br><span class="line"></span><br><span class="line">sudo apt install -y aview imagemagick</span><br><span class="line"></span><br><span class="line">wget https://labfile.oss.aliyuncs.com/courses/1/Linus.png</span><br></pre></td></tr></table></figure>
+<p>执行 <code>asciiview [图片文件名]</code> 即可打开图片：</p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93/1550043520959.png" alt="图片描述"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" rel="tag"># Linux基础入门</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E4%BB%BB%E5%8A%A1%E8%AE%A1%E5%88%92crontab/" rel="prev" title="Linux任务计划crontab">
+      <i class="fa fa-chevron-left"></i> Linux任务计划crontab
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%AE%80%E5%8D%95%E7%9A%84%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86/" rel="next" title="Linux简单的文本处理">
+      Linux简单的文本处理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E6%8E%A7%E5%88%B6%E4%B8%8E%E7%AE%A1%E9%81%93"><span class="nav-number">1.</span> <span class="nav-text">命令执行顺序控制与管道</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F%E7%9A%84%E6%8E%A7%E5%88%B6"><span class="nav-number">1.1.</span> <span class="nav-text">命令执行顺序的控制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A1%BA%E5%BA%8F%E6%89%A7%E8%A1%8C%E5%A4%9A%E6%9D%A1%E5%91%BD%E4%BB%A4"><span class="nav-number">1.1.1.</span> <span class="nav-text">顺序执行多条命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%89%E9%80%89%E6%8B%A9%E7%9A%84%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4"><span class="nav-number">1.1.2.</span> <span class="nav-text">有选择的执行命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%80%9D%E8%80%83"><span class="nav-number">1.1.3.</span> <span class="nav-text">思考</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%A1%E9%81%93"><span class="nav-number">1.2.</span> <span class="nav-text">管道</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%95%E7%94%A8"><span class="nav-number">1.2.1.</span> <span class="nav-text">试用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cut-%E5%91%BD%E4%BB%A4%EF%BC%8C%E6%89%93%E5%8D%B0%E6%AF%8F%E4%B8%80%E8%A1%8C%E7%9A%84%E6%9F%90%E4%B8%80%E5%AD%97%E6%AE%B5"><span class="nav-number">1.2.2.</span> <span class="nav-text">cut 命令，打印每一行的某一字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#grep-%E5%91%BD%E4%BB%A4%EF%BC%8C%E5%9C%A8%E6%96%87%E6%9C%AC%E4%B8%AD%E6%88%96-stdin-%E4%B8%AD%E6%9F%A5%E6%89%BE%E5%8C%B9%E9%85%8D%E5%AD%97%E7%AC%A6%E4%B8%B2"><span class="nav-number">1.2.3.</span> <span class="nav-text">grep 命令，在文本中或 stdin 中查找匹配字符串</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#wc-%E5%91%BD%E4%BB%A4%EF%BC%8C%E7%AE%80%E5%8D%95%E5%B0%8F%E5%B7%A7%E7%9A%84%E8%AE%A1%E6%95%B0%E5%B7%A5%E5%85%B7"><span class="nav-number">1.2.4.</span> <span class="nav-text">wc 命令，简单小巧的计数工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sort-%E6%8E%92%E5%BA%8F%E5%91%BD%E4%BB%A4"><span class="nav-number">1.2.5.</span> <span class="nav-text">sort 排序命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#uniq-%E5%8E%BB%E9%87%8D%E5%91%BD%E4%BB%A4"><span class="nav-number">1.2.6.</span> <span class="nav-text">uniq 去重命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%BB%E6%9D%BE%E4%B8%80%E4%B8%8B"><span class="nav-number">1.2.6.1.</span> <span class="nav-text">轻松一下</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lemonforce</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonforce</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/three-waves.min.js"></script>
+    <script defer src="/lib/three/canvas_sphere.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'gzXD9zEDA40Tphr5SR3SdW1Q-gzGzoHsz',
+      appKey     : 'OhkBCtuVUlWsxS1Bm4jQVLgX',
+      placeholder: "有啥想说的，尽情留言",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lemonforce.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Linux进程概念Linux基础入门16 进程的查看不管在测试的时候、在实际的生产环境中，还是自己的使用过程中，难免会遇到一些进程异常的情况，所以 Linux 为我们提供了一些工具来查看进程的状态信息。我们可以通过 top 实时的查看进程的状态，以及系统的一些信息（如 CPU、内存信息等），我们还可以通过 ps 来静态查看当前的进程信息，同时我们还可以使用 pstree 来查看当前活跃进程的树形结">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux进程管理">
+<meta property="og:url" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:site_name" content="lemonforce">
+<meta property="og:description" content="Linux进程概念Linux基础入门16 进程的查看不管在测试的时候、在实际的生产环境中，还是自己的使用过程中，难免会遇到一些进程异常的情况，所以 Linux 为我们提供了一些工具来查看进程的状态信息。我们可以通过 top 实时的查看进程的状态，以及系统的一些信息（如 CPU、内存信息等），我们还可以通过 ps 来静态查看当前的进程信息，同时我们还可以使用 pstree 来查看当前活跃进程的树形结">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469070319324">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469086224826">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469086474033">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469088103140">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469089342412">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469089837027">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469090040956">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469004994601">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469090893467">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469091089249">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469092567061">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469092779938">
+<meta property="article:published_time" content="2021-01-02T10:41:28.000Z">
+<meta property="article:modified_time" content="2021-01-02T11:56:37.786Z">
+<meta property="article:author" content="lemonforce">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Linux基础入门">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469070319324">
+
+<link rel="canonical" href="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux进程管理 | lemonforce</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">lemonforce</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lemonforce">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lemonforce">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux进程管理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-01-02 18:41:28 / 修改时间：19:56:37" itemprop="dateCreated datePublished" datetime="2021-01-02T18:41:28+08:00">2021-01-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/" class="post-meta-item leancloud_visitors" data-flag-title="Linux进程管理" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Linux进程概念"><a href="#Linux进程概念" class="headerlink" title="Linux进程概念"></a>Linux进程概念</h1><p>Linux基础入门16</p>
+<h2 id="进程的查看"><a href="#进程的查看" class="headerlink" title="进程的查看"></a>进程的查看</h2><p>不管在测试的时候、在实际的生产环境中，还是自己的使用过程中，难免会遇到一些进程异常的情况，所以 Linux 为我们提供了一些工具来查看进程的状态信息。我们可以通过 <code>top</code> 实时的查看进程的状态，以及系统的一些信息（如 CPU、内存信息等），我们还可以通过 <code>ps</code> 来静态查看当前的进程信息，同时我们还可以使用 <code>pstree</code> 来查看当前活跃进程的树形结构。</p>
+<h3 id="top-工具的使用"><a href="#top-工具的使用" class="headerlink" title="top 工具的使用"></a>top 工具的使用</h3><p><code>top</code> 工具是我们常用的一个查看工具，能实时的查看我们系统的一些关键信息的变化:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">top</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469070319324" alt="实验楼"></p>
+<p>top 是一个在前台执行的程序，所以执行后便进入到这样的一个交互界面，正是因为交互界面我们才可以实时的获取到系统与进程的信息。在交互界面中我们可以通过一些指令来操作和筛选。在此之前我们先来了解显示了哪些信息。</p>
+<p>我们看到 top 显示的第一排，</p>
+<table>
+<thead>
+<tr>
+<th>内容</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>top</td>
+<td>表示当前程序的名称</td>
+</tr>
+<tr>
+<td>11:05:18</td>
+<td>表示当前的系统的时间</td>
+</tr>
+<tr>
+<td>up 8 days,17:12</td>
+<td>表示该机器已经启动了多长时间</td>
+</tr>
+<tr>
+<td>1 user</td>
+<td>表示当前系统中只有一个用户</td>
+</tr>
+<tr>
+<td>load average: 0.29,0.20,0.25</td>
+<td>分别对应 1、5、15 分钟内 cpu 的平均负载</td>
+</tr>
+</tbody></table>
+<p>load average 在 wikipedia 中的解释是 the system load is a measure of the amount of work that a computer system is doing 也就是对当前 CPU 工作量的度量，具体来说也就是指运行队列的平均长度，也就是等待 CPU 的平均进程数相关的一个计算值。</p>
+<p>我们该如何看待这个 load average 数据呢？</p>
+<p>假设我们的系统是单 CPU、单内核的，把它比喻成是一条单向的桥，把 CPU 任务比作汽车。</p>
+<ul>
+<li>load = 0 的时候意味着这个桥上并没有车，cpu 没有任何任务；</li>
+<li>load &lt; 1 的时候意味着桥上的车并不多，一切都还是很流畅的，cpu 的任务并不多，资源还很充足；</li>
+<li>load = 1 的时候就意味着桥已经被车给占满了，没有一点空隙，cpu 已经在全力工作了，所有的资源都被用完了，当然还好，这还在能力范围之内，只是有点慢而已；</li>
+<li>load &gt; 1 的时候就意味着不仅仅是桥上已经被车占满了，就连桥外都被占满了，cpu 已经在全力工作，系统资源的用完了，但是还是有大量的进程在请求，在等待。若是这个值大于 2 表示进程请求超过 CPU 工作能力的 2 倍。而若是这个值大于 5 说明系统已经在超负荷运作了。</li>
+</ul>
+<p>这是单个 CPU 单核的情况，而实际生活中我们需要将得到的这个值除以我们的核数来看。我们可以通过以下的命令来查看 CPU 的个数与核心数：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#查看物理 CPU 的个数</span></span><br><span class="line">cat /proc/cpuinfo | grep <span class="string">&quot;physical id&quot;</span> | sort | uniq |wc -l</span><br><span class="line"></span><br><span class="line"><span class="comment">#每个 cpu 的核心数</span></span><br><span class="line">cat /proc/cpuinfo | grep <span class="string">&quot;physical id&quot;</span> | grep <span class="string">&quot;0&quot;</span> | wc -l</span><br></pre></td></tr></table></figure>
+<p>通过上面的指数我们可以得知 load 的临界值为 1 ，但是在实际生活中，比较有经验的运维或者系统管理员会将临界值定为 0.7。这里的指数都是除以核心数以后的值，不要混淆了</p>
+<ul>
+<li>若是 load &lt; 0.7 并不会去关注他；</li>
+<li>若是 0.7&lt; load &lt; 1 的时候我们就需要稍微关注一下了，虽然还可以应付但是这个值已经离临界不远了；</li>
+<li>若是 load = 1 的时候我们就需要警惕了，因为这个时候已经没有更多的资源的了，已经在全力以赴了；</li>
+<li>若是 load &gt; 5 的时候系统已经快不行了，这个时候你需要加班解决问题了</li>
+</ul>
+<p>通常我们都会先看 15 分钟的值来看这个大体的趋势，然后再看 5 分钟的值对比来看是否有下降的趋势。</p>
+<p>查看 busybox 的代码可以知道，数据是每 5 秒钟就检查一次活跃的进程数，然后计算出该值，然后 load 从 <code>/proc/loadavg</code> 中读取的。而这个 load 的值是如何计算的呢，这是 load 的计算的源码</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> FSHIFT      11          <span class="comment">/* nr of bits of precision */</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> FIXED_1     (1&lt;&lt;FSHIFT) <span class="comment">/* 1.0 as fixed-point(定点) */</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LOAD_FREQ   (5*HZ)      <span class="comment">/* 5 sec intervals，每隔5秒计算一次平均负载值 */</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> CALC_LOAD(load, exp, n)     \</span></span><br><span class="line">         load *= <span class="built_in">exp</span>;               \</span><br><span class="line">         load += n*(FIXED_1 - <span class="built_in">exp</span>); \</span><br><span class="line">         load &gt;&gt;= FSHIFT;</span><br><span class="line"></span><br><span class="line"><span class="keyword">unsigned</span> <span class="keyword">long</span> avenrun[<span class="number">3</span>];</span><br><span class="line"></span><br><span class="line">EXPORT_SYMBOL(avenrun);</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">* calc_load - given tick count, update the avenrun load estimates.</span></span><br><span class="line"><span class="comment">* This is called while holding a write_lock on xtime_lock.</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">inline</span> <span class="keyword">void</span> <span class="title">calc_load</span><span class="params">(<span class="keyword">unsigned</span> <span class="keyword">long</span> ticks)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">        <span class="keyword">unsigned</span> <span class="keyword">long</span> active_tasks; <span class="comment">/* fixed-point */</span></span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">int</span> count = LOAD_FREQ;</span><br><span class="line">        count -= ticks;</span><br><span class="line">        <span class="keyword">if</span> (count &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                count += LOAD_FREQ;</span><br><span class="line">                active_tasks = count_active_tasks();</span><br><span class="line">                CALC_LOAD(avenrun[<span class="number">0</span>], EXP_1, active_tasks);</span><br><span class="line">                CALC_LOAD(avenrun[<span class="number">1</span>], EXP_5, active_tasks);</span><br><span class="line">                CALC_LOAD(avenrun[<span class="number">2</span>], EXP_15, active_tasks);</span><br><span class="line">        &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>有兴趣的朋友可以研究一下，是如何计算的。代码中的后面这部分相当于它的计算公式。</p>
+</blockquote>
+<p>我们回归正题，来看 top 的第二行数据，基本上第二行是进程的一个情况统计：</p>
+<table>
+<thead>
+<tr>
+<th>内容</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Tasks: 26 total</td>
+<td>进程总数</td>
+</tr>
+<tr>
+<td>1 running</td>
+<td>1 个正在运行的进程数</td>
+</tr>
+<tr>
+<td>25 sleeping</td>
+<td>25 个睡眠的进程数</td>
+</tr>
+<tr>
+<td>0 stopped</td>
+<td>没有停止的进程数</td>
+</tr>
+<tr>
+<td>0 zombie</td>
+<td>没有僵尸进程数</td>
+</tr>
+</tbody></table>
+<p>来看 top 的第三行数据，这一行基本上是 CPU 的一个使用情况的统计了：</p>
+<table>
+<thead>
+<tr>
+<th>内容</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Cpu(s): 1.0%us</code></td>
+<td>用户空间进程占用 CPU 百分比</td>
+</tr>
+<tr>
+<td><code>1.0% sy</code></td>
+<td>内核空间运行占用 CPU 百分比</td>
+</tr>
+<tr>
+<td><code>0.0%ni</code></td>
+<td>用户进程空间内改变过优先级的进程占用 CPU 百分比</td>
+</tr>
+<tr>
+<td><code>97.9%id</code></td>
+<td>空闲 CPU 百分比</td>
+</tr>
+<tr>
+<td><code>0.0%wa</code></td>
+<td>等待输入输出的 CPU 时间百分比</td>
+</tr>
+<tr>
+<td><code>0.1%hi</code></td>
+<td>硬中断(Hardware IRQ)占用 CPU 的百分比</td>
+</tr>
+<tr>
+<td><code>0.0%si</code></td>
+<td>软中断(Software IRQ)占用 CPU 的百分比</td>
+</tr>
+<tr>
+<td><code>0.0%st</code></td>
+<td>(Steal time) 是 hypervisor 等虚拟服务中，虚拟 CPU 等待实际 CPU 的时间的百分比</td>
+</tr>
+</tbody></table>
+<p>CPU 利用率是对一个时间段内 CPU 使用状况的统计，通过这个指标可以看出在某一个时间段内 CPU 被占用的情况，而 Load Average 是 CPU 的 Load，它所包含的信息不是 CPU 的使用率状况，而是在一段时间内 CPU 正在处理以及等待 CPU 处理的进程数情况统计信息，这两个指标并不一样。</p>
+<p>来看 top 的第四行数据，这一行基本上是内存的一个使用情况的统计了：</p>
+<table>
+<thead>
+<tr>
+<th>内容</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>8176740 total</td>
+<td>物理内存总量</td>
+</tr>
+<tr>
+<td>8032104 used</td>
+<td>使用的物理内存总量</td>
+</tr>
+<tr>
+<td>144636 free</td>
+<td>空闲内存总量</td>
+</tr>
+<tr>
+<td>313088 buffers</td>
+<td>用作内核缓存的内存量</td>
+</tr>
+</tbody></table>
+<p><strong>注意：</strong></p>
+<blockquote>
+<p>系统中可用的物理内存最大值并不是 free 这个单一的值，而是 free + buffers + swap 中的 cached 的和。</p>
+</blockquote>
+<p>来看 top 的第五行数据，这一行基本上是交换区的一个使用情况的统计了：</p>
+<table>
+<thead>
+<tr>
+<th>内容</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>total</td>
+<td>交换区总量</td>
+</tr>
+<tr>
+<td>used</td>
+<td>使用的交换区总量</td>
+</tr>
+<tr>
+<td>free</td>
+<td>空闲交换区总量</td>
+</tr>
+<tr>
+<td>cached</td>
+<td>缓冲的交换区总量，内存中的内容被换出到交换区，而后又被换入到内存，但使用过的交换区尚未被覆盖</td>
+</tr>
+</tbody></table>
+<p>再下面就是进程的一个情况了</p>
+<table>
+<thead>
+<tr>
+<th>列名</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>PID</td>
+<td>进程 id</td>
+</tr>
+<tr>
+<td>USER</td>
+<td>该进程的所属用户</td>
+</tr>
+<tr>
+<td>PR</td>
+<td>该进程执行的优先级 priority 值</td>
+</tr>
+<tr>
+<td>NI</td>
+<td>该进程的 nice 值</td>
+</tr>
+<tr>
+<td>VIRT</td>
+<td>该进程任务所使用的虚拟内存的总数</td>
+</tr>
+<tr>
+<td>RES</td>
+<td>该进程所使用的物理内存数，也称之为驻留内存数</td>
+</tr>
+<tr>
+<td>SHR</td>
+<td>该进程共享内存的大小</td>
+</tr>
+<tr>
+<td>S</td>
+<td>该进程进程的状态: S=sleep R=running Z=zombie</td>
+</tr>
+<tr>
+<td>%CPU</td>
+<td>该进程 CPU 的利用率</td>
+</tr>
+<tr>
+<td>%MEM</td>
+<td>该进程内存的利用率</td>
+</tr>
+<tr>
+<td>TIME+</td>
+<td>该进程活跃的总时间</td>
+</tr>
+<tr>
+<td>COMMAND</td>
+<td>该进程运行的名字</td>
+</tr>
+</tbody></table>
+<p><strong>注意:</strong></p>
+<p><strong>NICE 值</strong>叫做静态优先级，是用户空间的一个优先级值，其取值范围是 -20 至 19。这个值越小，表示进程”优先级”越高，而值越大“优先级”越低。nice 值中的 -20 到 19，中 -20 优先级最高， 0 是默认的值，而 19 优先级最低。</p>
+<p><strong>PR 值</strong>表示 Priority 值叫动态优先级，是进程在内核中实际的优先级值，进程优先级的取值范围是通过一个宏定义的，这个宏的名称是 <code>MAX_PRIO</code>，它的值为 140。Linux 实际上实现了 140 个优先级范围，取值范围是从 <code>0-139</code>，这个值越小，优先级越高。而这其中的 <code>0-99</code> 是实时进程的值，而 <code>100-139</code> 是给用户的。</p>
+<p>其中 PR 中的 <code>100 to 139</code> 值部分有这么一个对应 <code>PR = 20 + (-20 to +19)</code>，这里的 <code>-20 to +19</code> 便是 nice 值，所以说两个虽然都是优先级，而且有千丝万缕的关系，但是他们的值，他们的作用范围并不相同。</p>
+<p><strong>VIRT</strong> 任务所使用的虚拟内存的总数，其中包含所有的代码，数据，共享库和被换出 swap 空间的页面等所占据空间的总数。</p>
+<p>在上文我们曾经说过 top 是一个前台程序，所以是一个可以交互的：</p>
+<table>
+<thead>
+<tr>
+<th>常用交互命令</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>q</td>
+<td>退出程序</td>
+</tr>
+<tr>
+<td>I</td>
+<td>切换显示平均负载和启动时间的信息</td>
+</tr>
+<tr>
+<td>P</td>
+<td>根据 CPU 使用百分比大小进行排序</td>
+</tr>
+<tr>
+<td>M</td>
+<td>根据驻留内存大小进行排序</td>
+</tr>
+<tr>
+<td>i</td>
+<td>忽略闲置和僵死的进程，这是一个开关式命令</td>
+</tr>
+<tr>
+<td>k</td>
+<td>终止一个进程，系统提示输入 PID 及发送的信号值。一般终止进程用 15 信号，不能正常结束则使用 9 信号。安全模式下该命令被屏蔽。</td>
+</tr>
+</tbody></table>
+<p>好好的利用 top 能够很有效的帮助我们观察到系统的瓶颈所在，或者是系统的问题所在。</p>
+<h3 id="ps-工具的使用"><a href="#ps-工具的使用" class="headerlink" title="ps 工具的使用"></a>ps 工具的使用</h3><p>ps 也是我们最常用的查看进程的工具之一，我们通过这样的一个命令来了解一下，它能给我们带来哪些信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps aux</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469086224826" alt="实验楼"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps axjf</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469086474033" alt="实验楼"></p>
+<p>我们来总体了解下会出现哪些信息给我们，这些信息又代表着什么（更多的 keywords 大家可以通过 <code>man ps</code> 了解）。</p>
+<table>
+<thead>
+<tr>
+<th>内容</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>F</code></td>
+<td>进程的标志（process flags），当 flags 值为 1 则表示此子程序只是 fork 但没有执行 exec，为 4 表示此程序使用超级管理员 root 权限</td>
+</tr>
+<tr>
+<td><code>USER</code></td>
+<td>进程的拥有用户</td>
+</tr>
+<tr>
+<td><code>PID</code></td>
+<td>进程的 ID</td>
+</tr>
+<tr>
+<td><code>PPID</code></td>
+<td>其父进程的 PID</td>
+</tr>
+<tr>
+<td><code>SID</code></td>
+<td>session 的 ID</td>
+</tr>
+<tr>
+<td><code>TPGID</code></td>
+<td>前台进程组的 ID</td>
+</tr>
+<tr>
+<td><code>%CPU</code></td>
+<td>进程占用的 CPU 百分比</td>
+</tr>
+<tr>
+<td><code>%MEM</code></td>
+<td>占用内存的百分比</td>
+</tr>
+<tr>
+<td><code>NI</code></td>
+<td>进程的 NICE 值</td>
+</tr>
+<tr>
+<td><code>VSZ</code></td>
+<td>进程使用虚拟内存大小</td>
+</tr>
+<tr>
+<td><code>RSS</code></td>
+<td>驻留内存中页的大小</td>
+</tr>
+<tr>
+<td><code>TTY</code></td>
+<td>终端 ID</td>
+</tr>
+<tr>
+<td><code>S or STAT</code></td>
+<td>进程状态</td>
+</tr>
+<tr>
+<td><code>WCHAN</code></td>
+<td>正在等待的进程资源</td>
+</tr>
+<tr>
+<td><code>START</code></td>
+<td>启动进程的时间</td>
+</tr>
+<tr>
+<td><code>TIME</code></td>
+<td>进程消耗 CPU 的时间</td>
+</tr>
+<tr>
+<td><code>COMMAND</code></td>
+<td>命令的名称和参数</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>TPGID</strong>栏写着-1 的都是没有控制终端的进程，也就是守护进程</p>
+</blockquote>
+<blockquote>
+<p><strong>STAT</strong>表示进程的状态，而进程的状态有很多，如下表所示</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>状态</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>R</code></td>
+<td>Running.运行中</td>
+</tr>
+<tr>
+<td><code>S</code></td>
+<td>Interruptible Sleep.等待调用</td>
+</tr>
+<tr>
+<td><code>D</code></td>
+<td>Uninterruptible Sleep.不可中断睡眠</td>
+</tr>
+<tr>
+<td><code>T</code></td>
+<td>Stoped.暂停或者跟踪状态</td>
+</tr>
+<tr>
+<td><code>X</code></td>
+<td>Dead.即将被撤销</td>
+</tr>
+<tr>
+<td><code>Z</code></td>
+<td>Zombie.僵尸进程</td>
+</tr>
+<tr>
+<td><code>W</code></td>
+<td>Paging.内存交换</td>
+</tr>
+<tr>
+<td><code>N</code></td>
+<td>优先级低的进程</td>
+</tr>
+<tr>
+<td><code>&lt;</code></td>
+<td>优先级高的进程</td>
+</tr>
+<tr>
+<td><code>s</code></td>
+<td>进程的领导者</td>
+</tr>
+<tr>
+<td><code>L</code></td>
+<td>锁定状态</td>
+</tr>
+<tr>
+<td><code>l</code></td>
+<td>多线程状态</td>
+</tr>
+<tr>
+<td><code>+</code></td>
+<td>前台进程</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>其中的 D 是不能被中断睡眠的状态，处在这种状态的进程不接受外来的任何 signal，所以无法使用 kill 命令杀掉处于 D 状态的进程，无论是 <code>kill</code>，<code>kill -9</code> 还是 <code>kill -15</code>，一般处于这种状态可能是进程 I/O 的时候出问题了。</p>
+</blockquote>
+<p>ps 工具有许多的参数，下面给大家解释部分常用的参数。</p>
+<p>使用 <code>-l</code> 参数可以显示自己这次登录的 bash 相关的进程信息罗列出来：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -l</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469088103140" alt="实验楼"></p>
+<p>相对来说我们更加常用下面这个命令，他将会罗列出所有的进程信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps aux</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469089342412" alt="实验楼"></p>
+<p>若是查找其中的某个进程的话，我们还可以配合着 <code>grep</code> 和正则表达式一起使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps aux | grep zsh</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469089837027" alt="实验楼"></p>
+<p>此外我们还可以查看时，将连同部分的进程呈树状显示出来：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps axjf</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469090040956" alt="实验楼"></p>
+<p>当然如果你觉得使用这样的此时没有把你想要的信息放在一起，我们也可以是用这样的命令，来自定义我们所需要的参数显示：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -afxo user,ppid,pid,pgid,<span class="built_in">command</span></span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469004994601" alt="实验楼"></p>
+<p>这是一个简单而又实用的工具，想要更灵活的使用，想要知道更多的参数我们可以使用 man 来获取更多相关的信息。</p>
+<h3 id="pstree-工具的使用"><a href="#pstree-工具的使用" class="headerlink" title="pstree 工具的使用"></a>pstree 工具的使用</h3><p>通过 <code>pstree</code> 可以很直接的看到相同的进程数量，最主要的还是我们可以看到所有进程之间的相关性。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pstree</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469090893467" alt="实验楼"></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pstree -up</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>参数选择</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-A</td>
+<td>程序树之间以 ASCII 字符连接</td>
+</tr>
+<tr>
+<td>-p</td>
+<td>同时列出每个 process 的 PID</td>
+</tr>
+<tr>
+<td>-u</td>
+<td>同时列出每个 process 的所属账户名称</td>
+</tr>
+</tbody></table>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469091089249" alt="实验楼"></p>
+<h2 id="进程的管理"><a href="#进程的管理" class="headerlink" title="进程的管理"></a>进程的管理</h2><p>本节将会为大家介绍如何去管理进程的。</p>
+<h3 id="kill-命令的掌握"><a href="#kill-命令的掌握" class="headerlink" title="kill 命令的掌握"></a>kill 命令的掌握</h3><p>上个实验中我们讲诉了进程之间是如何衍生，之间又有什么相关性，我们来回顾一下，当一个进程结束的时候或者要异常结束的时候，会向其父进程返回一个或者接收一个 SIGHUP 信号而做出的结束进程或者其他的操作，这个 SIGHUP 信号不仅可以由系统发送，我们可以使用 <code>kill</code> 来发送这个信号来操作进程的结束或者重启等等。</p>
+<p>上节课程我们使用 <code>kill</code> 命令来管理我们的一些 job，这节课我们将尝试用 <code>kill</code> 来操作下一些不属于 job 范畴的进程，直接对 pid 下手。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 首先我们使用图形界面打开了 gedit、gvim，用 ps 可以查看到</span></span><br><span class="line">ps aux</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用 9 这个信号强制结束 gedit 进程</span></span><br><span class="line"><span class="built_in">kill</span> -9 1608</span><br><span class="line"></span><br><span class="line"><span class="comment"># 我们再查找这个进程的时候就找不到了</span></span><br><span class="line">ps aux | grep gedit</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469092567061" alt="实验楼"></p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E7%AE%A1%E7%90%86/1135081469092779938" alt="实验楼"></p>
+<h3 id="进程的执行顺序"><a href="#进程的执行顺序" class="headerlink" title="进程的执行顺序"></a>进程的执行顺序</h3><p>我们在使用 ps 命令的时候可以看到大部分的进程都是处于休眠的状态，如果这些进程都被唤醒，那么该谁最先享受 CPU 的服务，后面的进程又该是一个什么样的顺序呢？进程调度的队列又该如何去排列呢？</p>
+<p>当然就是靠该进程的优先级值来判定进程调度的优先级，而优先级的值就是上文所提到的 PR 与 nice 来控制与体现了</p>
+<p>而 nice 的值我们是可以通过 nice 命令来修改的，而需要注意的是 nice 值可以调整的范围是 <code>-20 ~ 19</code>，其中 root 有着至高无上的权力，既可以调整自己的进程也可以调整其他用户的程序，并且是所有的值都可以用，而普通用户只可以调制属于自己的进程，并且其使用的范围只能是 <code>0 ~ 19</code>，因为系统为了避免一般用户抢占系统资源而设置的一个限制</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 这个实验在环境中无法做，因为权限不够，可以自己在本地尝试</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 打开一个程序放在后台，或者用图形界面打开</span></span><br><span class="line">nice -n -5 vim &amp;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 用 ps 查看其优先级</span></span><br><span class="line">ps -afxo user,ppid,pid,<span class="built_in">stat</span>,pri,ni,time,<span class="built_in">command</span> | grep vim</span><br></pre></td></tr></table></figure>
+<p>我们还可以用 renice 来修改已经存在的进程的优先级，同样因为权限的原因在实验环境中无法尝试。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">renice -5 pid</span><br></pre></td></tr></table></figure>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过本实验我们学会了进程的查看命令 ps，pstree，top，以及使用这些命令时所得到的信息的含义，从而获取我们需要的信息，同时我们学会了进程的管理命令 kill，nice，renice</p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p>注释 1: 该例子参考于<a target="_blank" rel="noopener" href="http://blog.scoutapp.com/articles/2009/07/31/understanding-load-averages">http://blog.scoutapp.com/articles/2009/07/31/understanding-load-averages</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" rel="tag"># Linux基础入门</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E8%BF%9B%E7%A8%8B%E6%A6%82%E5%BF%B5/" rel="prev" title="Linux进程概念">
+      <i class="fa fa-chevron-left"></i> Linux进程概念
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%97%A5%E5%BF%97%E7%B3%BB%E7%BB%9F/" rel="next" title="Linux日志系统">
+      Linux日志系统 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux%E8%BF%9B%E7%A8%8B%E6%A6%82%E5%BF%B5"><span class="nav-number">1.</span> <span class="nav-text">Linux进程概念</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%9A%84%E6%9F%A5%E7%9C%8B"><span class="nav-number">1.1.</span> <span class="nav-text">进程的查看</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#top-%E5%B7%A5%E5%85%B7%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">1.1.1.</span> <span class="nav-text">top 工具的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ps-%E5%B7%A5%E5%85%B7%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">1.1.2.</span> <span class="nav-text">ps 工具的使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pstree-%E5%B7%A5%E5%85%B7%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">1.1.3.</span> <span class="nav-text">pstree 工具的使用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%9A%84%E7%AE%A1%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text">进程的管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#kill-%E5%91%BD%E4%BB%A4%E7%9A%84%E6%8E%8C%E6%8F%A1"><span class="nav-number">1.2.1.</span> <span class="nav-text">kill 命令的掌握</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E7%A8%8B%E7%9A%84%E6%89%A7%E8%A1%8C%E9%A1%BA%E5%BA%8F"><span class="nav-number">1.2.2.</span> <span class="nav-text">进程的执行顺序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.3.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">1.3.0.1.</span> <span class="nav-text">参考资料</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lemonforce</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonforce</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/three-waves.min.js"></script>
+    <script defer src="/lib/three/canvas_sphere.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'gzXD9zEDA40Tphr5SR3SdW1Q-gzGzoHsz',
+      appKey     : 'OhkBCtuVUlWsxS1Bm4jQVLgX',
+      placeholder: "有啥想说的，尽情留言",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

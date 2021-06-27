@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lemonforce.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="运算符重载 上面是按从大到小排序，小于号重载为大于了 后面一个const表明这个函数不能对这个类中的成员进行修改。 const和函数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++知识整理">
+<meta property="og:url" content="https://lemonforce.github.io/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/index.html">
+<meta property="og:site_name" content="lemonforce">
+<meta property="og:description" content="运算符重载 上面是按从大到小排序，小于号重载为大于了 后面一个const表明这个函数不能对这个类中的成员进行修改。 const和函数">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/1602399615905.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/image-20201103151930633.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/1602400543324.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/1602400574475.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/1602400633819.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/PlanFang/PAT/C++零星基础知识点/1603700312625.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/PlanFang/PAT/C++零星基础知识点/1566782-20190624225555183-2085599880.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/PlanFang/PAT/C++零星基础知识点/1566782-20190624225400947-1766476156.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/WYJO1.png">
+<meta property="article:published_time" content="2021-01-01T05:08:45.000Z">
+<meta property="article:modified_time" content="2021-03-01T13:29:22.361Z">
+<meta property="article:author" content="lemonforce">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lemonforce.github.io/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/1602399615905.png">
+
+<link rel="canonical" href="https://lemonforce.github.io/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>C++知识整理 | lemonforce</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">lemonforce</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lemonforce.github.io/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lemonforce">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lemonforce">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          C++知识整理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-01 13:08:45" itemprop="dateCreated datePublished" datetime="2021-01-01T13:08:45+08:00">2021-01-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-03-01 21:29:22" itemprop="dateModified" datetime="2021-03-01T21:29:22+08:00">2021-03-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/" class="post-meta-item leancloud_visitors" data-flag-title="C++知识整理" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="运算符重载"><a href="#运算符重载" class="headerlink" title="运算符重载"></a>运算符重载</h2><p><img src="/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/1602399615905.png" alt="1602399615905"></p>
+<p>上面是按从大到小排序，小于号重载为大于了</p>
+<p>后面一个const表明这个函数不能对这个类中的成员进行修改。</p>
+<h2 id="const和函数"><a href="#const和函数" class="headerlink" title="const和函数"></a>const和函数</h2><p>　<strong>void fun() const{}; 、 const void fun(){}; 和void const fun(){}; 的区别？</strong></p>
+<p>　　答：</p>
+<p>const void fun(){};和void const fun(){};两个相同。</p>
+<p>如果采用”按址传递方式”的函数返回值加const 修饰，那么函数返回值（即地址）的内容不能被修改，该返回值只能被赋给加const 修饰的同类型指针。</p>
+<p>如果采用”按值传递方式”的函数返回值加const 修饰，由于函数会把返回值复制到外部临时的存储单元中，加const 修饰没有任何价值。</p>
+<p>所以不要尽量不要把int fun2();写成const int fun2(); 因为没意义。</p>
+<p>void fun() const{};</p>
+<p>类的成员函数后面加 const，表明这个函数不可以对这个类对象的数据成员（准确地说是非static数据成员）作任何改变。</p>
+<h2 id="Node-amp-head-和Node-head的区别"><a href="#Node-amp-head-和Node-head的区别" class="headerlink" title="Node *&amp; head 和Node *head的区别"></a>Node *&amp; head 和Node *head的区别</h2><p>Node *head 是定义一个指向Node结构bai体变量的du指zhi针。<br>Node *&amp;head实际上应该写成 (Node *)&amp;head，其中&amp;head是取变量head的地址dao，然后将此地址再转换为Node结构体类型的地址。在此表达式中，head的数据类型不一定是Node结构体数据的数据，它可以是任何类型的，与Node *无关。它仅仅用于取它的首地址。</p>
+<h2 id="数据类型范围"><a href="#数据类型范围" class="headerlink" title="数据类型范围"></a>数据类型范围</h2><p><img src="/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/image-20201103151930633.png" alt="image-20201103151930633"></p>
+<h2 id="map相关"><a href="#map相关" class="headerlink" title="map相关"></a>map相关</h2><p>map中若原先没有则默认为0，不会是随机值。</p>
+<p><img src="/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/1602400543324.png" alt="1602400543324"></p>
+<p>map的遍历，取值</p>
+<p><img src="/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/1602400574475.png" alt="1602400574475"></p>
+<h2 id="cout格式化输出"><a href="#cout格式化输出" class="headerlink" title="cout格式化输出"></a>cout格式化输出</h2><p>输出小数点后一位</p>
+<p>需要头文件<iomanip></iomanip></p>
+<p><img src="/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/1602400633819.png" alt="1602400633819"></p>
+<h2 id="INF取值"><a href="#INF取值" class="headerlink" title="INF取值"></a>INF取值</h2><p>INF一般设置为<strong>0x7fffffff</strong>或者<strong>0x3f3f3f3f</strong>。</p>
+<p>设置0x7fffffff的原因，这是32-bit int的最大值。</p>
+<p>如果这个无穷大只用于一般的比较（比如求最小值时min变量的初值），那么0x7fffffff确实是一个完美的选择。</p>
+<p>但是会有个小问题，0x7fffffff不能满足“无穷大加一个有穷的数依然是无穷大”这个条件，导致松弛操作会出错。</p>
+<p>0x3f3f3f3f的十进制是1061109567，是10^9级别的（和0x7fffffff一个数量级），而一般场合下的数据都是小于10^9的，所以它可以作为无穷大使用而不致出现数据大于无穷大的情形。</p>
+<p>事实上0x3f3f3f3f+0x3f3f3f3f=2122219134，这非常大但却没有超过32-bit int的表示范围，所以0x3f3f3f3f还满足了我们“无穷大加无穷大还是无穷大”的需求。</p>
+<p>如果我们想要将某个数组清零，我们通常会使用memset(a,0,sizeof(a))，方便又高效，但是当我们想将某个数组全部赋值为无穷大时，就不能使用memset函数而得自己写循环了，因为memset是按字节操作的，它能够对数组清零是因为0的每个字节都是0（一般我们只有赋值为-1和0的时候才使用它）。现在好了，如果我们将无穷大设为0x3f3f3f3f，那么奇迹就发生了，0x3f3f3f3f的每个字节都是0x3f！所以要把一段内存全部置为无穷大，我们只需要**memset(a,0x3f,sizeof(a))**。</p>
+<h2 id="fill-函数"><a href="#fill-函数" class="headerlink" title="fill()函数"></a>fill()函数</h2><p>fill（）中 ，它的原理是把那一块单元赋成指定的值，也就是说<strong>任何值</strong>都可以 <algorithm>，速度没有memset()快<br>memset（），则是将s所指向的某一块内存中的每个字节的内容全部设置为ch指定的ASCII值，即<strong>0 、1</strong></algorithm></p>
+<h2 id="max-函数"><a href="#max-函数" class="headerlink" title="max()函数"></a>max()函数</h2><algorithm>
+
+<p>取得最大值</p>
+<h2 id="climits头文件"><a href="#climits头文件" class="headerlink" title="climits头文件"></a>climits头文件</h2><p><climits>头文件定义的符号常量<br>CHAR_MIN 　　　　　　char的最小值<br>SCHAR_MAX 　　　　　signed char 最大值<br>SCHAR_MIN 　　　　　 signed char 最小值<br>UCHAR_MAX 　　　　　unsigned char 最大值<br>SHRT_MAX 　　　　　　short 最大值<br>SHRT_MIN　　　　　　 short 最小值<br>USHRT_MAX　　　　　 unsigned short 最大值<br>INT_MAX　　　　　　　int 最大值<br>INT_MIN 　　　　　　　int 最小值<br>UINT_MAX 　　　　　　unsigned int 最大值<br>UINT_MIN 　　　　　　unsigned int 最小值<br>LONG_MAX　　　　　　long最大值<br>LONG_MIN 　　　　　　long最小值<br>ULONG_MAX 　　　　　unsigned long 最大值<br>FLT_MANT_DIG　　　　float 类型的尾数<br>FLT_DIG　　　　　　　 float 类型的最少有效数字位数<br>FLT_MIN_10_EXP　　　带有全部有效数的float类型的负指数的最小值（以10为底）<br>FLT_MAX_10_EXP 　　 float类型的正指数的最大值（以10为底）<br>FLT_MIN 　　　　　　　保留全部精度的float类型正数最小值<br>FLT_MAX　　　　　　　 float类型正数最大值</climits></p>
+<h2 id="函数参数为void-void"><a href="#函数参数为void-void" class="headerlink" title="函数参数为void / void *"></a>函数参数为void / void *</h2><p>\1. void test(){}</p>
+<p>\2. void test(void){}</p>
+<p>\3. void test(void *){}</p>
+<p>1和2是相同的，表示test函数不接受任何参数，无论在c还是c++中如果函数不接受参数用2的方式书写是一种良好的习惯</p>
+<p>3表示test函数接受一个指针类型的参数，无论是什么指针，只要是指针就可以传入</p>
+<h2 id="max-element-函数"><a href="#max-element-函数" class="headerlink" title="max_element()函数"></a>max_element()函数</h2><p>max_element是用来来查询最大值所在的第一个位置。</p>
+<p>max_element有两种写法，第一种是从头迭代器到尾迭代器用自己写的方法去比较，<br>第二种是直接用它自带的头迭代器到尾迭代器的比较大小。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;algorithm&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">structs</span> &#123;</span></span><br><span class="line">	<span class="function"><span class="keyword">bool</span> <span class="title">operator</span><span class="params">()</span> <span class="params">(<span class="keyword">int</span> i, <span class="keyword">int</span> j)</span> </span>&#123;</span><br><span class="line"> 		<span class="keyword">return</span> i&lt;j; </span><br><span class="line">	&#125;</span><br><span class="line">&#125; structs;</span><br><span class="line"><span class="comment">//此处也可以直接用bool bools(int i, int j) &#123; return i&lt;j; &#125;</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">int</span> ints[] = &#123; <span class="number">3</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">2</span>,<span class="number">7</span>,<span class="number">6</span>,<span class="number">4</span> &#125;;</span><br><span class="line"><span class="comment">//方法一</span></span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;方法一最大值地址是&quot;</span> &lt;&lt; max_element(ints, ints + <span class="number">7</span>, structs) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;方法一最大值的位置是&quot;</span>  &lt;&lt; *max_element(ints, ints + <span class="number">7</span>, structs ) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line"><span class="comment">//方法二</span></span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;方法二最大值地址是&quot;</span> &lt;&lt; max_element(ints, ints + <span class="number">7</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line"><span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;方法二最大值的位置是&quot;</span>  &lt;&lt; *max_element(ints, ints + <span class="number">7</span>) &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line"><span class="comment">//如果不加*获取的是他的地址</span></span><br><span class="line"><span class="keyword">int</span> pos = *max_element(ints, ints + <span class="number">7</span>);</span><br><span class="line">	<span class="keyword">int</span> i;</span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">10</span>; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span> (ints[i] == pos)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">cout</span> &lt;&lt; <span class="string">&quot;最大值的位置是&quot;</span> &lt;&lt; i + <span class="number">1</span> &lt;&lt; <span class="built_in">endl</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>效果如下</p>
+<p><img src="/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/PlanFang\PAT\C++零星基础知识点\1603700312625.png" alt="1603700312625"></p>
+<h2 id="函数数组"><a href="#函数数组" class="headerlink" title="函数数组"></a>函数数组</h2><p>多个类似的函数放入一个数组中。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Stu</span> &#123;</span></span><br><span class="line">	<span class="keyword">int</span> name;</span><br><span class="line">	<span class="keyword">double</span> score[N];</span><br><span class="line">	<span class="keyword">int</span> rank[N];</span><br><span class="line">	<span class="keyword">int</span> best;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">cmp0</span><span class="params">(Stu stu1, Stu stu2)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> stu1.score[<span class="number">0</span>] &gt; stu2.score[<span class="number">0</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">cmp1</span><span class="params">(Stu stu1, Stu stu2)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> stu1.score[<span class="number">1</span>] &gt; stu2.score[<span class="number">1</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">cmp2</span><span class="params">(Stu stu1, Stu stu2)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> stu1.score[<span class="number">2</span>] &gt; stu2.score[<span class="number">2</span>];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">cmp3</span><span class="params">(Stu stu1, Stu stu2)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> stu1.score[<span class="number">3</span>] &gt; stu2.score[<span class="number">3</span>];</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">int</span> n, m;</span><br><span class="line">	<span class="built_in">scanf</span>(<span class="string">&quot;%d%d&quot;</span>, &amp;n, &amp;m);</span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; n; i++) &#123;</span><br><span class="line">		<span class="built_in">cin</span> &gt;&gt; stu[i];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">bool</span>(*cmp[])(Stu, Stu) = &#123; cmp0,cmp1,cmp2,cmp3 &#125;;</span><br><span class="line">    <span class="comment">//按照不同的方式排序</span></span><br><span class="line">	<span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; N; i++) &#123;</span><br><span class="line">		sort(stu, stu + n, cmp[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>另一种方式更加简洁</p>
+<p>定义一个全局的变量kase，在比较函数中，通过kase的不同值来排序；</p>
+<div style="page-break-after: always;"></div>
+
+<h2 id="重点知识点"><a href="#重点知识点" class="headerlink" title="重点知识点"></a>重点知识点</h2><h3 id="dijkstra算法-单源最短路径"><a href="#dijkstra算法-单源最短路径" class="headerlink" title="dijkstra算法(单源最短路径)"></a>dijkstra算法(单源最短路径)</h3><p>​    Dijkstra算法是解决单源最短路径问题的贪心算法。</p>
+<h3 id="深度优先遍历"><a href="#深度优先遍历" class="headerlink" title="深度优先遍历"></a>深度优先遍历</h3><h3 id="广度优先遍历"><a href="#广度优先遍历" class="headerlink" title="广度优先遍历"></a>广度优先遍历</h3><h3 id="图"><a href="#图" class="headerlink" title="图"></a>图</h3><h3 id="树"><a href="#树" class="headerlink" title="树"></a>树</h3><h3 id="二分查找"><a href="#二分查找" class="headerlink" title="二分查找"></a>二分查找</h3><p>看看 Knuth 大佬（发明 KMP 算法的那位）怎么说的：</p>
+<blockquote>
+<p>Although the basic idea of binary search is comparatively straightforward, the details can be surprisingly tricky…</p>
+</blockquote>
+<p>最常用的二分查找场景：寻找一个数、寻找左侧边界、寻找右侧边界。</p>
+<h4 id="二分查找的框架"><a href="#二分查找的框架" class="headerlink" title="二分查找的框架"></a>二分查找的框架</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">binarySearch</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> left = <span class="number">0</span>, right = ...;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(...) &#123;</span><br><span class="line">        <span class="keyword">int</span> mid = (right + left) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (nums[mid] == target) &#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nums[mid] &lt; target) &#123;</span><br><span class="line">            left = ...</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nums[mid] &gt; target) &#123;</span><br><span class="line">            right = ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ...;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>分析二分查找的一个技巧是：不要出现 else，而是把所有情况用 else if 写清楚，这样可以清楚地展现所有细节</strong>。本文都会使用 else if，旨在讲清楚，读者理解后可自行简化。</p>
+<p>其中…标记的部分，就是可能出现细节问题的地方，当你见到一个二分查找的代码时，首先注意这几个地方。后文用实例分析这些地方能有什么样的变化。</p>
+<p>另外声明一下，计算 mid 时需要技巧防止溢出，建议写成: <strong>mid = left + (right - left) / 2</strong>，本文暂时忽略这个问题</p>
+<h4 id="寻找一个数（封闭区间）"><a href="#寻找一个数（封闭区间）" class="headerlink" title="寻找一个数（封闭区间）"></a>寻找一个数（封闭区间）</h4><p>这个场景是最简单的，可能也是大家最熟悉的，即搜索一个数，如果存在，返回其索引，否则返回 -1。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">binarySearch</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> left = <span class="number">0</span>; </span><br><span class="line">    <span class="keyword">int</span> right = nums.length - <span class="number">1</span>; <span class="comment">// 注意</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(left &lt;= right) &#123; <span class="comment">// 注意</span></span><br><span class="line">        <span class="keyword">int</span> mid = (right + left) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span>(nums[mid] == target)</span><br><span class="line">            <span class="keyword">return</span> mid; </span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (nums[mid] &lt; target)</span><br><span class="line">            left = mid + <span class="number">1</span>; <span class="comment">// 注意</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (nums[mid] &gt; target)</span><br><span class="line">            right = mid - <span class="number">1</span>; <span class="comment">// 注意</span></span><br><span class="line">        &#125;</span><br><span class="line">    <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><em>1</em>. 为什么 while 循环的条件中是 &lt;=，而不是 &lt; ？</p>
+<p>答：因为初始化 right 的赋值是 nums.length - 1，即最后一个元素的索引，而不是 nums.length。</p>
+<p>这二者可能出现在不同功能的二分查找中，区别是：前者相当于两端都闭区间 [left, right]，后者相当于左闭右开区间 [left, right)，因为索引大小为 nums.length 是越界的。</p>
+<p>我们这个算法中使用的是 [left, right] 两端都闭的区间。**这个区间就是每次进行搜索的区间，我们不妨称为「搜索区间」(search space)**。</p>
+<p>什么时候应该停止搜索呢？当然，找到了目标值的时候可以终止：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(nums[mid] == target)</span><br><span class="line">    <span class="keyword">return</span> mid; </span><br></pre></td></tr></table></figure>
+<p>但如果没找到，就需要 while 循环终止，然后返回 -1。那 while 循环什么时候应该终止？<strong>搜索区间为空的时候应该终止</strong>，意味着你没得找了，就等于没找到嘛。</p>
+<p>while(left &lt;= right)的终止条件是 left == right + 1，写成区间的形式就是 [right + 1, right]，或者带个具体的数字进去 [3, 2]，可见<strong>这时候搜索区间为空</strong>，因为没有数字既大于等于 3 又小于等于 2 的吧。所以这时候 while 循环终止是正确的，直接返回 -1 即可。</p>
+<p>while(left &lt; right)的终止条件是 left == right，写成区间的形式就是 [right, right]，或者带个具体的数字进去 [2, 2]，<strong>这时候搜索区间非空</strong>，还有一个数 2，但此时 while 循环终止了。也就是说这区间 [2, 2] 被漏掉了，索引 2 没有被搜索，如果这时候直接返回 -1 就可能出现错误。</p>
+<p>当然，如果你非要用 while(left &lt; right) 也可以，我们已经知道了出错的原因，就打个补丁好了：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//...</span></span><br><span class="line"><span class="keyword">while</span>(left &lt; right) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">return</span> nums[left] == target ? left : -<span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p><em>2</em>. 为什么 left = mid + 1，right = mid - 1？我看有的代码是 right = mid 或者 left = mid，没有这些加加减减，到底怎么回事，怎么判断？</p>
+<p>答：这也是二分查找的一个难点，不过只要你能理解前面的内容，就能够很容易判断。</p>
+<p>刚才明确了「搜索区间」这个概念，而且本算法的搜索区间是两端都闭的，即 [left, right]。那么当我们发现索引 mid 不是要找的 target 时，如何确定下一步的搜索区间呢？</p>
+<p>当然是去搜索 [left, mid - 1] 或者 [mid + 1, right] 对不对？因为 mid 已经搜索过，应该从搜索区间中去除。</p>
+<p><em>3</em>. 此算法有什么缺陷？</p>
+<p>答：至此，你应该已经掌握了该算法的所有细节，以及这样处理的原因。但是，这个算法存在局限性。</p>
+<p>比如说给你有序数组 nums = [1,2,2,2,3]，target = 2，此算法返回的索引是 2，没错。但是如果我想得到 target 的左侧边界，即索引 1，或者我想得到 target 的右侧边界，即索引 3，这样的话此算法是无法处理的。</p>
+<p>这样的需求很常见。你也许会说，找到一个 target 索引，然后向左或向右线性搜索不行吗？可以，但是不好，因为这样难以保证二分查找对数级的时间复杂度了。</p>
+<p>我们后续的算法就来讨论这两种二分查找的算法。</p>
+<h4 id="寻找左侧边界的二分搜索-左闭右开"><a href="#寻找左侧边界的二分搜索-左闭右开" class="headerlink" title="寻找左侧边界的二分搜索(左闭右开)"></a><strong>寻找左侧边界的二分搜索</strong>(左闭右开)</h4><p>直接看代码，其中的标记是需要注意的细节：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">left_bound</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (nums.length == <span class="number">0</span>) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> left = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> right = nums.length; <span class="comment">// 注意</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (left &lt; right) &#123; <span class="comment">// 注意</span></span><br><span class="line">        <span class="keyword">int</span> mid = (left + right) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (nums[mid] == target) &#123;</span><br><span class="line">            right = mid;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nums[mid] &lt; target) &#123;</span><br><span class="line">            left = mid + <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nums[mid] &gt; target) &#123;</span><br><span class="line">            right = mid; <span class="comment">// 注意</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> left;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><em>1.</em> 为什么 while(left &lt; right) 而不是 &lt;= ?</p>
+<p>答：用相同的方法分析，因为初始化 right = nums.length 而不是 nums.length - 1 。因此每次循环的「搜索区间」是 [left, right) 左闭右开。</p>
+<p>while(left &lt; right) 终止的条件是 left == right，此时搜索区间 [left, left) 恰巧为空，所以可以正确终止。</p>
+<p><em>2.</em> 为什么没有返回 -1 的操作？如果 nums 中不存在 target 这个值，怎么办？</p>
+<p>答：因为要一步一步来，先理解一下这个「左侧边界」有什么特殊含义：</p>
+<p><img src="/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/PlanFang\PAT\C++零星基础知识点\1566782-20190624225555183-2085599880.jpg" alt="img"></p>
+<p>对于这个数组，算法会返回 1。这个 1 的含义可以这样解读：nums 中小于 2 的元素有 1 个。</p>
+<p>比如对于有序数组 nums = [2,3,5,7], target = 1，算法会返回 0，含义是：nums 中小于 1 的元素有 0 个。如果 target = 8，算法会返回 4，含义是：nums 中小于 8 的元素有 4 个。</p>
+<p>综上可以看出，函数的返回值（即 left 变量的值）取值区间是闭区间 [0, nums.length]，所以我们简单添加两行代码就能在正确的时候 return -1：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (left &lt; right) &#123;</span><br><span class="line">    <span class="comment">//...</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// target 比所有数都大</span></span><br><span class="line"><span class="keyword">if</span> (left == nums.length) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line"><span class="comment">// 类似之前算法的处理方式</span></span><br><span class="line"><span class="keyword">return</span> nums[left] == target ? left : -<span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p><em>3.</em> 为什么 left = mid + 1，right = mid ？和之前的算法不一样？</p>
+<p>答：这个很好解释，因为我们的「搜索区间」是 [left, right) 左闭右开，所以当 nums[mid] 被检测之后，下一步的搜索区间应该去掉 mid 分割成两个区间，即 [left, mid) 或 [mid + 1, right)。</p>
+<p><em>4.</em> 为什么该算法能够搜索左侧边界？</p>
+<p>答：关键在于对于 nums[mid] == target 这种情况的处理：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (nums[mid] == target)</span><br><span class="line">    right = mid;</span><br></pre></td></tr></table></figure>
+<p>可见，找到 target 时不要立即返回，而是缩小「搜索区间」的上界 right，在区间 [left, mid) 中继续搜索，即不断向左收缩，达到锁定左侧边界的目的。</p>
+<p><em>5.</em> 为什么返回 left 而不是 right？</p>
+<p>答：返回left和right都是一样的，因为 while 终止的条件是 left == right。</p>
+<h4 id="寻找右侧边界的二分查找（左开右闭）"><a href="#寻找右侧边界的二分查找（左开右闭）" class="headerlink" title="寻找右侧边界的二分查找（左开右闭）"></a>寻找右侧边界的二分查找（左开右闭）</h4><p>寻找右侧边界和寻找左侧边界的代码差不多，只有两处不同，已标注：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">right_bound</span><span class="params">(<span class="keyword">int</span>[] nums, <span class="keyword">int</span> target)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (nums.length == <span class="number">0</span>) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">int</span> left = <span class="number">0</span>, right = nums.length;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (left &lt; right) &#123;</span><br><span class="line">        <span class="keyword">int</span> mid = (left + right) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">if</span> (nums[mid] == target) &#123;</span><br><span class="line">            left = mid + <span class="number">1</span>; <span class="comment">// 注意</span></span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nums[mid] &lt; target) &#123;</span><br><span class="line">            left = mid + <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (nums[mid] &gt; target) &#123;</span><br><span class="line">            right = mid;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> left - <span class="number">1</span>; <span class="comment">// 注意</span></span><br></pre></td></tr></table></figure>
+<p><em>1.</em> 为什么这个算法能够找到右侧边界？</p>
+<p>答：类似地，关键点还是这里：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (nums[mid] == target) &#123;</span><br><span class="line">    left = mid + <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<p>当 nums[mid] == target 时，不要立即返回，而是增大「搜索区间」的下界 left，使得区间不断向右收缩，达到锁定右侧边界的目的。</p>
+<p><em>2.</em> 为什么最后返回 left - 1 而不像左侧边界的函数，返回 left？而且我觉得这里既然是搜索右侧边界，应该返回 right 才对。</p>
+<p>答：首先，while 循环的终止条件是 left == right，所以 left 和 right 是一样的，你非要体现右侧的特点，返回 right - 1 好了。</p>
+<p>至于为什么要减一，这是搜索右侧边界的一个特殊点，关键在这个条件判断：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (nums[mid] == target) &#123;</span><br><span class="line">    left = mid + <span class="number">1</span>;</span><br><span class="line">    <span class="comment">// 这样想: mid = left - 1</span></span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/PlanFang\PAT\C++零星基础知识点\1566782-20190624225400947-1766476156.jpg" alt="img"></p>
+<p>因为我们对 left 的更新必须是 left = mid + 1，就是说 while 循环结束时，nums[left] <strong>一定不等于</strong> target 了，而 nums[left - 1]<strong>可能是</strong>target。</p>
+<p>至于为什么 left 的更新必须是 left = mid + 1，同左侧边界搜索，就不再赘述。</p>
+<p><em>3.</em> 为什么没有返回 -1 的操作？如果 nums 中不存在 target 这个值，怎么办？</p>
+<p>答：类似之前的左侧边界搜索，因为 while 的终止条件是 left == right，就是说 left 的取值范围是 [0, nums.length]，所以可以添加两行代码，正确地返回 -1：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (left &lt; right) &#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">if</span> (left == <span class="number">0</span>) <span class="keyword">return</span> -<span class="number">1</span>;</span><br><span class="line"><span class="keyword">return</span> nums[left-<span class="number">1</span>] == target ? (left-<span class="number">1</span>) : -<span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+<h4 id="最后总结"><a href="#最后总结" class="headerlink" title="最后总结"></a>最后总结</h4><p>先来梳理一下这些细节差异的因果逻辑：</p>
+<p>第一个，最基本的二分查找算法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">因为我们初始化 right = nums.length - <span class="number">1</span></span><br><span class="line">所以决定了我们的「搜索区间」是 [left, right]</span><br><span class="line">所以决定了 <span class="keyword">while</span> (left &lt;= right)</span><br><span class="line">同时也决定了 left = mid+<span class="number">1</span> 和 right = mid-<span class="number">1</span></span><br><span class="line"></span><br><span class="line">因为我们只需找到一个 target 的索引即可</span><br><span class="line">所以当 nums[mid] == target 时可以立即返回</span><br></pre></td></tr></table></figure>
+<p>第二个，寻找左侧边界的二分查找：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">因为我们初始化 right = nums.length</span><br><span class="line">所以决定了我们的「搜索区间」是 [left, right)</span><br><span class="line">所以决定了 <span class="keyword">while</span> (left &lt; right)</span><br><span class="line">同时也决定了 left = mid+<span class="number">1</span> 和 right = mid</span><br><span class="line"></span><br><span class="line">因为我们需找到 target 的最左侧索引</span><br><span class="line">所以当 nums[mid] == target 时不要立即返回</span><br><span class="line">而要收紧右侧边界以锁定左侧边界</span><br></pre></td></tr></table></figure>
+<p>第三个，寻找右侧边界的二分查找：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">因为我们初始化 right = nums.length</span><br><span class="line">所以决定了我们的「搜索区间」是 [left, right)</span><br><span class="line">所以决定了 <span class="keyword">while</span> (left &lt; right)</span><br><span class="line">同时也决定了 left = mid+<span class="number">1</span> 和 right = mid</span><br><span class="line"></span><br><span class="line">因为我们需找到 target 的最右侧索引</span><br><span class="line">所以当 nums[mid] == target 时不要立即返回</span><br><span class="line">而要收紧左侧边界以锁定右侧边界</span><br><span class="line"></span><br><span class="line">又因为收紧左侧边界时必须 left = mid + <span class="number">1</span></span><br><span class="line">所以最后无论返回 left 还是 right，必须减一</span><br></pre></td></tr></table></figure>
+<p>如果以上内容你都能理解，那么恭喜你，二分查找算法的细节不过如此。</p>
+<p>通过本文，你学会了：</p>
+<p><em>1.</em> 分析二分查找代码时，不要出现 else，全部展开成 else if 方便理解。</p>
+<p><em>2.</em> 注意「搜索区间」和 while 的终止条件，如果存在漏掉的元素，记得在最后检查。</p>
+<p><em>3.</em> 如需要搜索左右边界，只要在 nums[mid] == target 时做修改即可。搜索右侧时需要减一。</p>
+<p>就算遇到其他的二分查找变形，运用这几点技巧，也能保证你写出正确的代码。LeetCode Explore 中有二分查找的专项练习，其中提供了三种不同的代码模板，现在你再去看看，很容易就知道这几个模板的实现原理了。</p>
+<h1 id="基础函数"><a href="#基础函数" class="headerlink" title="基础函数"></a>基础函数</h1><h2 id="常用math函数"><a href="#常用math函数" class="headerlink" title="常用math函数"></a>常用math函数</h2><table>
+<thead>
+<tr>
+<th>函数</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>fabs(double x)</td>
+<td>对double取绝对值</td>
+</tr>
+<tr>
+<td>floor(double x)</td>
+<td>向下取整</td>
+</tr>
+<tr>
+<td>ceil(double x)</td>
+<td>向上取整</td>
+</tr>
+<tr>
+<td>pow(double r, double p)</td>
+<td>r的p次</td>
+</tr>
+<tr>
+<td>sqrt(double x)</td>
+<td>算术平方根</td>
+</tr>
+<tr>
+<td>log(double x)</td>
+<td>以e为底的对数</td>
+</tr>
+<tr>
+<td>sin(double x)</td>
+<td>正弦值（弧度制）</td>
+</tr>
+<tr>
+<td>asin(double x)</td>
+<td>反正弦值（弧度制）</td>
+</tr>
+<tr>
+<td>round(double x)</td>
+<td>四舍五入（返回的也是double，需取整）</td>
+</tr>
+</tbody></table>
+<h2 id="sscanf-与sprintf"><a href="#sscanf-与sprintf" class="headerlink" title="sscanf()与sprintf()"></a>sscanf()与sprintf()</h2><h2 id="一些数"><a href="#一些数" class="headerlink" title="一些数"></a>一些数</h2><h3 id="浮点数的比较"><a href="#浮点数的比较" class="headerlink" title="浮点数的比较"></a>浮点数的比较</h3><p>用一个极小数eps进行误差修正。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">double</span> eps = <span class="number">1e-8</span>;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="圆周率"><a href="#圆周率" class="headerlink" title="圆周率"></a>圆周率</h3><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> pi = arccos(<span class="number">-1</span>);</span><br></pre></td></tr></table></figure>
+<h1 id="VS输入警告"><a href="#VS输入警告" class="headerlink" title="VS输入警告"></a>VS输入警告</h1><p>You can add “_CRT_SECURE_NO_WARNINGS” in Preprocessor Definitions.</p>
+<p>Right-click your project-&gt;Properties-&gt;Configuration Properties-&gt;C/C++ -&gt;Preprocessor-&gt;Preprocessor Definitions.</p>
+<p><img src="/2021/01/01/C&C++/C-%E9%9B%B6%E6%98%9F%E7%9F%A5%E8%AF%86%E7%82%B9/WYJO1.png" alt="enter image description here"></p>
+<p><code> #pragma warning(disable : 6031)</code></p>
+</algorithm>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/C/" rel="tag"># C++</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/01/%E7%88%B1%E5%A5%BD/%E8%BF%85%E9%9B%B7%E8%BF%9C%E7%A8%8B%E4%B8%8B%E8%BD%BD/" rel="next" title="迅雷远程下载">
+      迅雷远程下载 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD"><span class="nav-number">1.</span> <span class="nav-text">运算符重载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#const%E5%92%8C%E5%87%BD%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">const和函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Node-amp-head-%E5%92%8CNode-head%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">3.</span> <span class="nav-text">Node *&amp; head 和Node *head的区别</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E8%8C%83%E5%9B%B4"><span class="nav-number">4.</span> <span class="nav-text">数据类型范围</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#map%E7%9B%B8%E5%85%B3"><span class="nav-number">5.</span> <span class="nav-text">map相关</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cout%E6%A0%BC%E5%BC%8F%E5%8C%96%E8%BE%93%E5%87%BA"><span class="nav-number">6.</span> <span class="nav-text">cout格式化输出</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#INF%E5%8F%96%E5%80%BC"><span class="nav-number">7.</span> <span class="nav-text">INF取值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#fill-%E5%87%BD%E6%95%B0"><span class="nav-number">8.</span> <span class="nav-text">fill()函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#max-%E5%87%BD%E6%95%B0"><span class="nav-number">9.</span> <span class="nav-text">max()函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#climits%E5%A4%B4%E6%96%87%E4%BB%B6"><span class="nav-number">10.</span> <span class="nav-text">climits头文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E5%8F%82%E6%95%B0%E4%B8%BAvoid-void"><span class="nav-number">11.</span> <span class="nav-text">函数参数为void &#x2F; void *</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#max-element-%E5%87%BD%E6%95%B0"><span class="nav-number">12.</span> <span class="nav-text">max_element()函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0%E6%95%B0%E7%BB%84"><span class="nav-number">13.</span> <span class="nav-text">函数数组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E7%82%B9%E7%9F%A5%E8%AF%86%E7%82%B9"><span class="nav-number">14.</span> <span class="nav-text">重点知识点</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#dijkstra%E7%AE%97%E6%B3%95-%E5%8D%95%E6%BA%90%E6%9C%80%E7%9F%AD%E8%B7%AF%E5%BE%84"><span class="nav-number">14.1.</span> <span class="nav-text">dijkstra算法(单源最短路径)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E9%81%8D%E5%8E%86"><span class="nav-number">14.2.</span> <span class="nav-text">深度优先遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B9%BF%E5%BA%A6%E4%BC%98%E5%85%88%E9%81%8D%E5%8E%86"><span class="nav-number">14.3.</span> <span class="nav-text">广度优先遍历</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%BE"><span class="nav-number">14.4.</span> <span class="nav-text">图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%91"><span class="nav-number">14.5.</span> <span class="nav-text">树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE"><span class="nav-number">14.6.</span> <span class="nav-text">二分查找</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%E7%9A%84%E6%A1%86%E6%9E%B6"><span class="nav-number">14.6.1.</span> <span class="nav-text">二分查找的框架</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE%E4%B8%80%E4%B8%AA%E6%95%B0%EF%BC%88%E5%B0%81%E9%97%AD%E5%8C%BA%E9%97%B4%EF%BC%89"><span class="nav-number">14.6.2.</span> <span class="nav-text">寻找一个数（封闭区间）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE%E5%B7%A6%E4%BE%A7%E8%BE%B9%E7%95%8C%E7%9A%84%E4%BA%8C%E5%88%86%E6%90%9C%E7%B4%A2-%E5%B7%A6%E9%97%AD%E5%8F%B3%E5%BC%80"><span class="nav-number">14.6.3.</span> <span class="nav-text">寻找左侧边界的二分搜索(左闭右开)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AF%BB%E6%89%BE%E5%8F%B3%E4%BE%A7%E8%BE%B9%E7%95%8C%E7%9A%84%E4%BA%8C%E5%88%86%E6%9F%A5%E6%89%BE%EF%BC%88%E5%B7%A6%E5%BC%80%E5%8F%B3%E9%97%AD%EF%BC%89"><span class="nav-number">14.6.4.</span> <span class="nav-text">寻找右侧边界的二分查找（左开右闭）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%80%E5%90%8E%E6%80%BB%E7%BB%93"><span class="nav-number">14.6.5.</span> <span class="nav-text">最后总结</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E7%A1%80%E5%87%BD%E6%95%B0"><span class="nav-number"></span> <span class="nav-text">基础函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8math%E5%87%BD%E6%95%B0"><span class="nav-number">1.</span> <span class="nav-text">常用math函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#sscanf-%E4%B8%8Esprintf"><span class="nav-number">2.</span> <span class="nav-text">sscanf()与sprintf()</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E4%BA%9B%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">一些数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B5%AE%E7%82%B9%E6%95%B0%E7%9A%84%E6%AF%94%E8%BE%83"><span class="nav-number">3.1.</span> <span class="nav-text">浮点数的比较</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%86%E5%91%A8%E7%8E%87"><span class="nav-number">3.2.</span> <span class="nav-text">圆周率</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#VS%E8%BE%93%E5%85%A5%E8%AD%A6%E5%91%8A"><span class="nav-number"></span> <span class="nav-text">VS输入警告</span></a></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lemonforce</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonforce</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/three-waves.min.js"></script>
+    <script defer src="/lib/three/canvas_sphere.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'gzXD9zEDA40Tphr5SR3SdW1Q-gzGzoHsz',
+      appKey     : 'OhkBCtuVUlWsxS1Bm4jQVLgX',
+      placeholder: "有啥想说的，尽情留言",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

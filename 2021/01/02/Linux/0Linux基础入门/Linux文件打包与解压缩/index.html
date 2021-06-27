@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lemonforce.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="文件打包与解压缩Linux基础入门6 概念讲解在讲 Linux 上的压缩工具之前，有必要先了解一下常见常用的压缩包文件格式。在 Windows 上最常见的不外乎这两种 *.zip，*.7z 后缀的压缩文件。而在 Linux 上面常见的格式除了以上两种外，还有 .rar，*.gz，*.xz，*.bz2，*.tar，*.tar.gz，*.tar.xz，*.tar.bz2，简单介绍如下：    文件后缀">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux文件打包与解压缩">
+<meta property="og:url" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/index.html">
+<meta property="og:site_name" content="lemonforce">
+<meta property="og:description" content="文件打包与解压缩Linux基础入门6 概念讲解在讲 Linux 上的压缩工具之前，有必要先了解一下常见常用的压缩包文件格式。在 Windows 上最常见的不外乎这两种 *.zip，*.7z 后缀的压缩文件。而在 Linux 上面常见的格式除了以上两种外，还有 .rar，*.gz，*.xz，*.bz2，*.tar，*.tar.gz，*.tar.xz，*.tar.bz2，简单介绍如下：    文件后缀">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/uid600404-20190428-1556438181236">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/document-uid735639labid61timestamp1532339561961.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/fire.gif">
+<meta property="article:published_time" content="2021-01-02T10:37:34.000Z">
+<meta property="article:modified_time" content="2021-01-02T11:57:59.580Z">
+<meta property="article:author" content="lemonforce">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Linux基础入门">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/uid600404-20190428-1556438181236">
+
+<link rel="canonical" href="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux文件打包与解压缩 | lemonforce</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">lemonforce</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lemonforce">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lemonforce">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux文件打包与解压缩
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-01-02 18:37:34 / 修改时间：19:57:59" itemprop="dateCreated datePublished" datetime="2021-01-02T18:37:34+08:00">2021-01-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/" class="post-meta-item leancloud_visitors" data-flag-title="Linux文件打包与解压缩" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="文件打包与解压缩"><a href="#文件打包与解压缩" class="headerlink" title="文件打包与解压缩"></a>文件打包与解压缩</h1><p>Linux基础入门6</p>
+<h2 id="概念讲解"><a href="#概念讲解" class="headerlink" title="概念讲解"></a>概念讲解</h2><p>在讲 Linux 上的压缩工具之前，有必要先了解一下常见常用的压缩包文件格式。在 Windows 上最常见的不外乎这两种 <code>*.zip</code>，<code>*.7z</code> 后缀的压缩文件。而在 Linux 上面常见的格式除了以上两种外，还有 <code>.rar</code>，<code>*.gz</code>，<code>*.xz</code>，<code>*.bz2</code>，<code>*.tar</code>，<code>*.tar.gz</code>，<code>*.tar.xz</code>，<code>*.tar.bz2</code>，简单介绍如下：</p>
+<table>
+<thead>
+<tr>
+<th>文件后缀名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>*.zip</code></td>
+<td>zip 程序打包压缩的文件</td>
+</tr>
+<tr>
+<td><code>*.rar</code></td>
+<td>rar 程序压缩的文件</td>
+</tr>
+<tr>
+<td><code>*.7z</code></td>
+<td>7zip 程序压缩的文件</td>
+</tr>
+<tr>
+<td><code>*.tar</code></td>
+<td>tar 程序打包，未压缩的文件</td>
+</tr>
+<tr>
+<td><code>*.gz</code></td>
+<td>gzip 程序（GNU zip）压缩的文件</td>
+</tr>
+<tr>
+<td><code>*.xz</code></td>
+<td>xz 程序压缩的文件</td>
+</tr>
+<tr>
+<td><code>*.bz2</code></td>
+<td>bzip2 程序压缩的文件</td>
+</tr>
+<tr>
+<td><code>*.tar.gz</code></td>
+<td>tar 打包，gzip 程序压缩的文件</td>
+</tr>
+<tr>
+<td><code>*.tar.xz</code></td>
+<td>tar 打包，xz 程序压缩的文件</td>
+</tr>
+<tr>
+<td><code>*tar.bz2</code></td>
+<td>tar 打包，bzip2 程序压缩的文件</td>
+</tr>
+<tr>
+<td><code>*.tar.7z</code></td>
+<td>tar 打包，7z 程序压缩的文件</td>
+</tr>
+</tbody></table>
+<p>讲了这么多种压缩文件，这么多个命令，不过我们一般只需要掌握几个命令即可，包括 <code>zip</code>，<code>tar</code>。下面会依次介绍这几个命令及对应的解压命令。</p>
+<h3 id="zip-压缩打包程序"><a href="#zip-压缩打包程序" class="headerlink" title="zip 压缩打包程序"></a>zip 压缩打包程序</h3><ul>
+<li>使用 zip 打包文件夹，注意输入完整的参数和路径：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /home/shiyanlou</span><br><span class="line">zip -r -q -o shiyanlou.zip /home/shiyanlou/Desktop</span><br><span class="line">du -h shiyanlou.zip</span><br><span class="line">file shiyanlou.zip</span><br></pre></td></tr></table></figure>
+<p>上面命令将目录 <code>/home/shiyanlou/Desktop</code> 打包成一个文件，并查看了打包后文件的大小和类型。第一行命令中，<code>-r</code> 参数表示递归打包包含子目录的全部内容，<code>-q</code> 参数表示为安静模式，即不向屏幕输出信息，<code>-o</code>，表示输出文件，需在其后紧跟打包输出文件名。后面使用 <code>du</code> 命令查看打包后文件的大小（后面会具体说明该命令）。</p>
+<ul>
+<li>设置压缩级别为 9 和 1（9 最大，1 最小），重新打包：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">zip -r -9 -q -o shiyanlou_9.zip /home/shiyanlou/Desktop -x ~/*.zip</span><br><span class="line">zip -r -1 -q -o shiyanlou_1.zip /home/shiyanlou/Desktop -x ~/*.zip</span><br></pre></td></tr></table></figure>
+<p>这里添加了一个参数用于设置压缩级别 <code>-[1-9]</code>，1 表示最快压缩但体积大，9 表示体积最小但耗时最久。最后那个 <code>-x</code> 是为了排除我们上一次创建的 zip 文件，否则又会被打包进这一次的压缩文件中，<strong>注意：这里只能使用绝对路径，否则不起作用</strong>。</p>
+<p>我们再用 <code>du</code> 命令分别查看默认压缩级别、最低、最高压缩级别及未压缩的文件的大小：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">du -h -d 0 *.zip ~ | sort</span><br></pre></td></tr></table></figure>
+<p>通过 man 手册可知：</p>
+<ul>
+<li><code>-h</code>， –human-readable（顾名思义，你可以试试不加的情况）</li>
+<li><code>-d</code>， –max-depth（所查看文件的深度）</li>
+</ul>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/uid600404-20190428-1556438181236" alt="图片描述"></p>
+<p>这样一目了然，理论上来说默认压缩级别应该是最高的，但是由于文件不大，这里的差异不明显（几乎看不出差别），不过你在环境中操作之后看到的压缩文件大小可能跟图上的有些不同，因为系统在使用过程中，会随时生成一些缓存文件在当前用户的家目录中，这对于我们学习命令使用来说，是无关紧要的，可以忽略这些不同。</p>
+<ul>
+<li>创建加密 zip 包</li>
+</ul>
+<p>使用 <code>-e</code> 参数可以创建加密压缩包：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zip -r -e -o shiyanlou_encryption.zip /home/shiyanlou/Desktop</span><br></pre></td></tr></table></figure>
+<p><strong>注意：</strong> 关于 <code>zip</code> 命令，因为 Windows 系统与 Linux/Unix 在文本文件格式上的一些兼容问题，比如换行符（为不可见字符），在 Windows 为 CR+LF（Carriage-Return+Line-Feed：回车加换行），而在 Linux/Unix 上为 LF（换行），所以如果在不加处理的情况下，在 Linux 上编辑的文本，在 Windows 系统上打开可能看起来是没有换行的。如果你想让你在 Linux 创建的 zip 压缩文件在 Windows 上解压后没有任何问题，那么你还需要对命令做一些修改：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zip -r -l -o shiyanlou.zip /home/shiyanlou/Desktop</span><br></pre></td></tr></table></figure>
+<p>需要加上 <code>-l</code> 参数将 <code>LF</code> 转换为 <code>CR+LF</code> 来达到以上目的。</p>
+<h3 id="使用-unzip-命令解压缩-zip-文件"><a href="#使用-unzip-命令解压缩-zip-文件" class="headerlink" title="使用 unzip 命令解压缩 zip 文件"></a>使用 unzip 命令解压缩 zip 文件</h3><p>将 <code>shiyanlou.zip</code> 解压到当前目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unzip shiyanlou.zip</span><br></pre></td></tr></table></figure>
+<p>使用安静模式，将文件解压到指定目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unzip -q shiyanlou.zip -d ziptest</span><br></pre></td></tr></table></figure>
+<p>上述指定目录不存在，将会自动创建。如果你不想解压只想查看压缩包的内容你可以使用 <code>-l</code> 参数：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unzip -l shiyanlou.zip</span><br></pre></td></tr></table></figure>
+<p><strong>注意：</strong> 使用 unzip 解压文件时我们同样应该注意兼容问题，不过这里我们关心的不再是上面的问题，而是中文编码的问题，通常 Windows 系统上面创建的压缩文件，如果有有包含中文的文档或以中文作为文件名的文件时默认会采用 GBK 或其它编码，而 Linux 上面默认使用的是 UTF-8 编码，如果不加任何处理，直接解压的话可能会出现中文乱码的问题（有时候它会自动帮你处理），为了解决这个问题，我们可以在解压时指定编码类型。</p>
+<p>使用 <code>-O</code>（英文字母，大写 o）参数指定编码类型：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">unzip -O GBK 中文压缩文件.zip</span><br></pre></td></tr></table></figure>
+<h3 id="tar-打包工具"><a href="#tar-打包工具" class="headerlink" title="tar 打包工具"></a>tar 打包工具</h3><p>在 Linux 上面更常用的是 <code>tar</code> 工具，tar 原本只是一个打包工具，只是同时还是实现了对 7z、gzip、xz、bzip2 等工具的支持，这些压缩工具本身只能实现对文件或目录（单独压缩目录中的文件）的压缩，没有实现对文件的打包压缩，所以我们也无需再单独去学习其他几个工具，tar 的解压和压缩都是同一个命令，只需参数不同，使用比较方便。</p>
+<p>下面先掌握 <code>tar</code> 命令一些基本的使用方式，即不进行压缩只是进行打包（创建归档文件）和解包的操作。</p>
+<ul>
+<li>创建一个 tar 包：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /home/shiyanlou</span><br><span class="line">tar -P -cf shiyanlou.tar /home/shiyanlou/Desktop</span><br></pre></td></tr></table></figure>
+<p>上面命令中，<code>-P</code> 保留绝对路径符，<code>-c</code> 表示创建一个 tar 包文件，<code>-f</code> 用于指定创建的文件名，注意文件名必须紧跟在 <code>-f</code> 参数之后，比如不能写成 <code>tar -fc shiyanlou.tar</code>，可以写成 <code>tar -f shiyanlou.tar -c ~</code>。你还可以加上 <code>-v</code> 参数以可视的的方式输出打包的文件。</p>
+<ul>
+<li>解包一个文件（<code>-x</code> 参数）到指定路径的<strong>已存在</strong>目录（<code>-C</code> 参数）：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mkdir tardir</span><br><span class="line">tar -xf shiyanlou.tar -C tardir</span><br></pre></td></tr></table></figure>
+<ul>
+<li>只查看不解包文件 <code>-t</code> 参数：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -tf shiyanlou.tar</span><br></pre></td></tr></table></figure>
+<ul>
+<li>保留文件属性和跟随链接（符号链接或软链接），有时候我们使用 tar 备份文件当你在其他主机还原时希望保留文件的属性（<code>-p</code> 参数）和备份链接指向的源文件而不是链接本身（<code>-h</code> 参数）：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -cphf etc.tar /etc</span><br></pre></td></tr></table></figure>
+<p>对于创建不同的压缩格式的文件，对于 tar 来说是相当简单的，需要的只是换一个参数，这里我们就以使用 <code>gzip</code> 工具创建 <code>*.tar.gz</code> 文件为例来说明。</p>
+<ul>
+<li>我们只需要在创建 tar 文件的基础上添加 <code>-z</code> 参数，使用 <code>gzip</code> 来压缩文件：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -czf shiyanlou.tar.gz /home/shiyanlou/Desktop</span><br></pre></td></tr></table></figure>
+<ul>
+<li>解压 <code>*.tar.gz</code> 文件：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tar -xzf shiyanlou.tar.gz</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/document-uid735639labid61timestamp1532339561961.png" alt="此处输入图片的描述"></p>
+<p>现在我们要使用其它的压缩工具创建或解压相应文件只需要更改一个参数即可：</p>
+<table>
+<thead>
+<tr>
+<th>压缩文件格式</th>
+<th>参数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>*.tar.gz</code></td>
+<td><code>-z</code></td>
+</tr>
+<tr>
+<td><code>*.tar.xz</code></td>
+<td><code>-J</code></td>
+</tr>
+<tr>
+<td><code>*tar.bz2</code></td>
+<td><code>-j</code></td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>tar 命令的参数很多，不过常用的就是上述这些，需要了解更多你可以查看 man 手册获取帮助。</p>
+</blockquote>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>说了这么多，其实平常使用的参数并没有那么复杂，只需要记住常用的组合就可以了。 常用命令：</p>
+<ul>
+<li>zip：</li>
+<li>打包 ：zip something.zip something （目录请加 -r 参数）</li>
+<li>解包：unzip something.zip</li>
+<li>指定路径：-d 参数</li>
+<li>tar：</li>
+<li>打包：tar -cf something.tar something</li>
+<li>解包：tar -xf something.tar</li>
+<li>指定路径：-C 参数</li>
+</ul>
+<h2 id="轻松一下"><a href="#轻松一下" class="headerlink" title="轻松一下"></a>轻松一下</h2><p>天冷的时候，要是有个火炉就好了。这里有个有趣的程序：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install libaa-bin</span><br><span class="line"><span class="comment"># 提示 command not found ，请自行解决</span></span><br><span class="line">aafire</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/fire.gif" alt="1"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" rel="tag"># Linux基础入门</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E4%B8%8E%E6%96%87%E4%BB%B6%E6%9F%A5%E6%89%BE/" rel="prev" title="Linux环境变量与文件查找">
+      <i class="fa fa-chevron-left"></i> Linux环境变量与文件查找
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/" rel="next" title="Linux文件系统操作与磁盘管理">
+      Linux文件系统操作与磁盘管理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9"><span class="nav-number">1.</span> <span class="nav-text">文件打包与解压缩</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E5%BF%B5%E8%AE%B2%E8%A7%A3"><span class="nav-number">1.1.</span> <span class="nav-text">概念讲解</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#zip-%E5%8E%8B%E7%BC%A9%E6%89%93%E5%8C%85%E7%A8%8B%E5%BA%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">zip 压缩打包程序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-unzip-%E5%91%BD%E4%BB%A4%E8%A7%A3%E5%8E%8B%E7%BC%A9-zip-%E6%96%87%E4%BB%B6"><span class="nav-number">1.1.2.</span> <span class="nav-text">使用 unzip 命令解压缩 zip 文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#tar-%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7"><span class="nav-number">1.1.3.</span> <span class="nav-text">tar 打包工具</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">1.2.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%BB%E6%9D%BE%E4%B8%80%E4%B8%8B"><span class="nav-number">1.3.</span> <span class="nav-text">轻松一下</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lemonforce</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonforce</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/three-waves.min.js"></script>
+    <script defer src="/lib/three/canvas_sphere.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'gzXD9zEDA40Tphr5SR3SdW1Q-gzGzoHsz',
+      appKey     : 'OhkBCtuVUlWsxS1Bm4jQVLgX',
+      placeholder: "有啥想说的，尽情留言",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

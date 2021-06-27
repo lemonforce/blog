@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lemonforce.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Linux各个发行版本对比与简介首先我们要能够清晰的区分Linux系统内核与Linux发行套件系统的区别，Linux系统内核指的是一个由Linus Torvalds负责维护，提供硬件抽象层、硬盘及文件系统控制及多任务功能的系统核心程序。而Linux发行套件系统才是我们常说的Linux操作系统，也即是由Linux内核与各种常用软件的集合产品，全球大约有数百款的Linux系统版本，每个系统版本都有自己">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux技巧">
+<meta property="og:url" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/index.html">
+<meta property="og:site_name" content="lemonforce">
+<meta property="og:description" content="Linux各个发行版本对比与简介首先我们要能够清晰的区分Linux系统内核与Linux发行套件系统的区别，Linux系统内核指的是一个由Linus Torvalds负责维护，提供硬件抽象层、硬盘及文件系统控制及多任务功能的系统核心程序。而Linux发行套件系统才是我们常说的Linux操作系统，也即是由Linux内核与各种常用软件的集合产品，全球大约有数百款的Linux系统版本，每个系统版本都有自己">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-c14b0dba51bdfb92ccf110ab8252bd9f_720w.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-dbee42347ea5a790ad2e75db3eb62293_720w.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-27e6076c0b8c35a4feabd756a473a4c9_720w.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-73d3e637e7b7ee55ecf63483f93e1f04_720w.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-de0932326e3c5dbf069a26ecf58d1f9c_720w.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-9f050aee9f34940bca616934fec2b975_720w.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-3645e6f0e7c8118c1c4ae8ebb3d2a3f9_720w.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-aeee2c53b8322bc2b137428f9287e7a8_r.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-e479f24ce6150c9d5f22dc8fad3e4722_r.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-56bb99cfd71397633f63f1055fd0f1cf_r.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-db1b362201070f4d2ff97ea2ef13ec5b_r.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-ad3e2920e6a0a111af3c06a160db75a8_r.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-d296ff3b3880daeadc36a75baa764248_r.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-6f8a3f977c9fbfe9c3b6c490ff90a54a_r.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-2ed70f0bd53d1c79771488b8618f98ce_r.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-c730857dbd830f370ad45ef8244bcb7f_r.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-e5d93022e0f6e7ed3ee06d2e0011547a_r.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/image-20201221162438665.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/vim%E9%94%AE%E7%9B%98%E5%9B%BE.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/image-20201222203422901.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/image-20201222203511222.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/20201019164217110.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/20201019164254342.jpg">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/20201019164320773.jpg">
+<meta property="article:published_time" content="2021-01-01T11:05:37.000Z">
+<meta property="article:modified_time" content="2021-01-21T12:29:58.414Z">
+<meta property="article:author" content="lemonforce">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-c14b0dba51bdfb92ccf110ab8252bd9f_720w.jpg">
+
+<link rel="canonical" href="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux技巧 | lemonforce</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">lemonforce</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lemonforce.github.io/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lemonforce">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lemonforce">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux技巧
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-01 19:05:37" itemprop="dateCreated datePublished" datetime="2021-01-01T19:05:37+08:00">2021-01-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-21 20:29:58" itemprop="dateModified" datetime="2021-01-21T20:29:58+08:00">2021-01-21</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/" class="post-meta-item leancloud_visitors" data-flag-title="Linux技巧" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Linux各个发行版本对比与简介"><a href="#Linux各个发行版本对比与简介" class="headerlink" title="Linux各个发行版本对比与简介"></a>Linux各个发行版本对比与简介</h1><p>首先我们要能够清晰的区分Linux系统内核与Linux发行套件系统的区别，Linux系统内核指的是一个由Linus Torvalds负责维护，提供硬件抽象层、硬盘及文件系统控制及多任务功能的系统核心程序。而Linux发行套件系统才是我们常说的Linux操作系统，也即是由Linux内核与各种常用软件的集合产品，全球大约有数百款的Linux系统版本，每个系统版本都有自己的特性和目标人群，所以绝不能一概而论谁是第一，谁是第二。</p>
+<p>Linux的发行版本可以大体分为两类，一类是商业公司维护的发行版本，一类是社区组织维护的发行版本，前者以著名的Red Hat（RHEL红帽）为代表，后者以Debian为代表。下面我来总结和对比一下几个Linux的发行版本。</p>
+<p><strong><font size="5"><strong>1.RHEL红帽</strong></font></strong></p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-c14b0dba51bdfb92ccf110ab8252bd9f_720w.jpg" alt="img"></p>
+<p>Redhat，应该称为Redhat系列，包括</p>
+<p>（1）RHEL （Redhat Enterprise Linux，也就是所谓的Redhat Advance Server，收费版本，稳定性非常好，适合服务器使用）</p>
+<p>（2）Fedora Core （由原来的Redhat桌面版本发展而来，免费版本，稳定性较差，最好只用于桌面应用）</p>
+<p>（3）CentOS （RHEL的社区克隆版本，免费版本，稳定性非常好，适合服务器使用）</p>
+<p>Redhat是国内使用人群最多的Linux版本，以至于有的人将Redhat等同于Linux，而有些老手更是只用这一个版本的Linux。所以有什么不明白的地方，很容易找到人来问，而且网上的Linux教程基本都是以Redhat为例来讲解。Redhat系列的包管理方式采用的是基于RPM包和YUM包的管理方式，包分发方式是编译好的二进制文件。</p>
+<p><strong><font size="5"><strong>2. CentOS</strong></font></strong></p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-dbee42347ea5a790ad2e75db3eb62293_720w.jpg" alt="img"></p>
+<p><strong>社区企业操作系统（Community Enterprise Operating System,Centos）</strong></p>
+<p>来自于Red Hat Enterprise Linux依照开放源代码规定释出的源代码所编译而成。由于出自同样的源代码，因此有些要求高度稳定性的服务器以CentOS替代商业版的Red Hat Enterprise Linux使用。两者的不同，在于CentOS并不包含封闭源代码软件。</p>
+<p>CentOS 是RHEL源代码再编译的产物，而且在RHEL的基础上修正了不少已知的 Bug ，相对于其他 Linux 发行版，其稳定性值得信赖。</p>
+<p><strong><font size="5"><strong>3.Fedora</strong></font></strong></p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-27e6076c0b8c35a4feabd756a473a4c9_720w.jpg" alt="img"></p>
+<p>用户可免费体验到最新的技术或工具，而功能成熟后会被加入到RHEL系统中。因此也被称为RHEL系统的“试验田”，如果感兴趣的话，可以多关注此类系统的发展变化及新特性。</p>
+<p>由全球社区爱好者构建的面向日常应用的快速且强大的操作系统。它允许任何人自由地使用、修改和重发布，无论现在还是将来。它由一个强大的社群开发，这个社群的成员以自己的不懈努力，提供并维护自由、开源代码的软件和开放的标准。Fedora 项目由 Fedora 基金会管理和控制，得到了 Red Hat 的支持。Fedora （第七版以前为Fedora Core）是一款基于 Linux 的操作系统，也是一组维持计算机正常运行的软件集合。其目标是创建一套新颖、多功能并且自由和开源的操作系统。</p>
+<p><strong><font size="5"><strong>4.OpenSUSE</strong></font></strong></p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-73d3e637e7b7ee55ecf63483f93e1f04_720w.jpg" alt="img"></p>
+<p>德国著名的Linux系统，全球范围内有着不错的声誉及市场占有率，发行量在欧洲占第一位。</p>
+<p>OpenSUSE对个人来说是完全免费的，包括使用和在线更新。OpenSUSE被评价为最华丽的Linux桌面发行版，甚至超越win7，但它的优势绝不仅仅局限于win7还要绚丽的用户交互界面，其性能也绝不亚于其他Linux桌面发行版！</p>
+<p><strong><font size="5"><strong>5.Gentoo</strong></font></strong></p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-de0932326e3c5dbf069a26ecf58d1f9c_720w.jpg" alt="img"></p>
+<p>具有极高的自定制性，操作复杂，因此适合有经验的人员使用。</p>
+<p>它能为几乎任何应用程序或需求自动地作出优化和定制。追求极限的配置、性能，以及顶尖的用户和开发者社区，都是Gentoo体验的标志特点。 Gentoo的哲学是自由和选择。得益于一种称为Portage的技术，Gentoo能成为理想的安全服务器、开发工作站、专业桌面、游戏系统、嵌入式解决方案或者别的东西——你想让它成为什么，它就可以成为什么</p>
+<p><strong><font size="5"><strong>6.Debian</strong></font></strong></p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-9f050aee9f34940bca616934fec2b975_720w.jpg" alt="img"></p>
+<p>应该称为Debian 系列，包括Debian和Ubuntu等。Debian是社区类Linux的典范，是迄今为止最遵循GNU规范的Linux系统。提供了接近十万种不同的开源软件支持，在国外用于很高的认可度和使用率。对于各类内核架构支持性良好，稳定性、安全性强更有免费的技术支持。</p>
+<p>Debian最具特色的是apt-get / dpkg包管理方式，其实Redhat的YUM也是在模仿Debian的APT方式，但在二进制文件发行方式中，APT应该是最好的了。Debian的资料也很丰富，有很多支持的社区，有问题求教也有地方可去。</p>
+<p><strong>分为三个版本分支(branch):</strong></p>
+<p>（1）unstable，为最新的测试版本，其中包括最新的软件包，但是也有相对较多的bug，适合桌面用户。</p>
+<p>（2）testing，经过unstable中的测试，相对较为稳定，也支持了不少新技术。</p>
+<p>（3）stable，一般只用于服务器，上面的软件包大部分都比较过时，但是稳定和安全性都非常的高。</p>
+<p><strong><font size="5"><strong>7.Ubuntu</strong></font></strong></p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-3645e6f0e7c8118c1c4ae8ebb3d2a3f9_720w.jpg" alt="img"></p>
+<p>Ubuntu是一款基于Debian派生的操作系统（严格来说不能算一个独立的发行版本），对新款硬件具有极强的兼容能力。</p>
+<p>特点是界面非常友好，容易上手，对硬件支持非常全面，是最适合做桌面系统的Linux发行版本，同时Ubuntu也可用于服务器领域。 Ubuntu的目标在于为一般用户提供一个最新的，同时又相对稳定的主要自由软件构建而成的操作系统。Ubuntu具有强大的社区力量，用户可以方便地从社区获取帮助。</p>
+<h1 id="Linux-包管理基础"><a href="#Linux-包管理基础" class="headerlink" title="Linux 包管理基础"></a>Linux 包管理基础</h1><p><strong><font size="5">介绍</font></strong></p>
+<p>大多数现代的类 Unix 操作系统都提供了一种中心化的机制用来搜索和安装软件。软件通常都是存放在存储库中，并通过包的形式进行分发。处理包的工作被称为包管理。包提供了操作系统的基本组件，以及共享的库、应用程序、服务和文档。</p>
+<p>包管理系统除了安装软件外，它还提供了工具来更新已经安装的包。包存储库有助于确保你的系统中使用的代码是经过审查的，并且软件的安装版本已经得到了开发人员和包维护人员的认可。</p>
+<p>在配置服务器或开发环境时，我们最好了解下包在官方存储库之外的情况。某个发行版的稳定版本中的包有可能已经过时了，尤其是那些新的或者快速迭代的软件。然而，包管理无论对于系统管理员还是开发人员来说都是至关重要的技能，而已打包的软件对于主流 Linux 发行版来说也是一笔巨大的财富。</p>
+<p>本指南旨在快速地介绍下在多种 Linux 发行版中查找、安装和升级软件包的基础知识，并帮助您将这些内容在多个系统之间进行交叉对比。</p>
+<p><strong><font size="5">包管理系统：简要概述</font></strong></p>
+<p>大多数包系统都是围绕包文件的集合构建的。包文件通常是一个存档文件，它包含已编译的二进制文件和软件的其他资源，以及安装脚本。包文件同时也包含有价值的元数据，包括它们的依赖项，以及安装和运行它们所需的其他包的列表。</p>
+<p>虽然这些包管理系统的功能和优点大致相同，但打包格式和工具却因平台而异：</p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-aeee2c53b8322bc2b137428f9287e7a8_r.jpg" alt="img"></p>
+<p>Debian 及其衍生版，如 Ubuntu、Linux Mint 和 Raspbian，它们的包格式是 .deb。APT 这款先进的包管理工具提供了大多数常见的操作命令：搜索存储库、安装软件包及其依赖项，并管理升级。在本地系统中，我们还可以使用 dpkg 程序来安装单个的 deb 文件，APT 命令作为底层 dpkg 的前端，有时也会直接调用它。</p>
+<p>最近发布的 debian 衍生版大多数都包含了 apt 命令，它提供了一个简洁统一的接口，可用于通常由 apt-get 和 apt-cache 命令处理的常见操作。这个命令是可选的，但使用它可以简化一些任务。</p>
+<p>CentOS、Fedora 和其它 Red Hat 家族成员使用 RPM 文件。在 CentOS 中，通过 yum 来与单独的包文件和存储库进行交互。</p>
+<p>在最近的 Fedora 版本中，yum 已经被 dnf 取代，dnf 是它的一个现代化的分支，它保留了大部分 yum 的接口。</p>
+<p>FreeBSD 的二进制包系统由 pkg 命令管理。FreeBSD 还提供了 Ports 集合，这是一个存在于本地的目录结构和工具，它允许用户获取源码后使用 Makefile 直接从源码编译和安装包。</p>
+<p><strong><font size="5">更新包列表</font></strong></p>
+<p>大多数系统在本地都会有一个和远程存储库对应的包数据库，在安装或升级包之前最好更新一下这个数据库。另外，yum 和 dnf 在执行一些操作之前也会自动检查更新。当然你可以在任何时候对系统进行更新。</p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-e479f24ce6150c9d5f22dc8fad3e4722_r.jpg" alt="img"></p>
+<p><strong><font size="5">更新已安装的包</font></strong></p>
+<p>在没有包系统的情况下，想确保机器上所有已安装的软件都保持在最新的状态是一个很艰巨的任务。你将不得不跟踪数百个不同包的上游更改和安全警报。虽然包管理器并不能解决升级软件时遇到的所有问题，但它确实使你能够使用一些命令来维护大多数系统组件。</p>
+<p>在 FreeBSD 上，升级已安装的 ports 可能会引入破坏性的改变，有些步骤还需要进行手动配置，所以在通过 portmaster 更新之前最好阅读下 /usr/ports/UPDATING 的内容。</p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-56bb99cfd71397633f63f1055fd0f1cf_r.jpg" alt="img"></p>
+<p><strong><font size="5">搜索某个包</font></strong></p>
+<p>大多数发行版都提供针对包集合的图形化或菜单驱动的工具，我们可以分类浏览软件，这也是一个发现新软件的好方法。然而，查找包最快和最有效的方法是使用命令行工具进行搜索。</p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-db1b362201070f4d2ff97ea2ef13ec5b_r.jpg" alt="img"></p>
+<p><strong><font size="5">查看某个软件包的信息</font></strong></p>
+<p>在安装软件包之前，我们可以通过仔细阅读包的描述来获得很多有用的信息。除了人类可读的文本之外，这些内容通常包括像版本号这样的元数据和包的依赖项列表。</p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-ad3e2920e6a0a111af3c06a160db75a8_r.jpg" alt="img"></p>
+<p><strong><font size="5">从存储库安装包</font></strong></p>
+<p>知道包名后，通常可以用一个命令来安装它及其依赖。你也可以一次性安装多个包，只需将它们全部列出来即可。</p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-d296ff3b3880daeadc36a75baa764248_r.jpg" alt="img"></p>
+<p><strong><font size="5">从本地文件系统安装一个包</font></strong></p>
+<p>对于一个给定的操作系统，有时有些软件官方并没有提供相应的包，那么开发人员或供应商将需要提供包文件的下载。你通常可以通过 web 浏览器检索这些包，或者通过命令行 curl 来检索这些信息。将包下载到目标系统后，我们通常可以通过单个命令来安装它。</p>
+<p>在 Debian 派生的系统上，dpkg 用来处理单个的包文件。如果一个包有未满足的依赖项，那么我们可以使用 gdebi 从官方存储库中检索它们。</p>
+<p>在 CentOS 和 Fedora 系统上，yum 和 dnf 用于安装单个的文件，并且会处理需要的依赖。</p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-6f8a3f977c9fbfe9c3b6c490ff90a54a_r.jpg" alt="img"></p>
+<p><strong><font size="5">删除一个或多个已安装的包</font></strong></p>
+<p>由于包管理器知道给定的软件包提供了哪些文件，因此如果某个软件不再需要了，它通常可以干净利落地从系统中清除这些文件。</p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-2ed70f0bd53d1c79771488b8618f98ce_r.jpg" alt="img"></p>
+<p><strong><font size="5">apt 命令</font></strong></p>
+<p>Debian 家族发行版的管理员通常熟悉 apt-get 和 apt-cache。较少为人所知的是简化的 apt 接口，它是专为交互式使用而设计的。</p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-c730857dbd830f370ad45ef8244bcb7f_r.jpg" alt="img"></p>
+<p>虽然 apt 通常是一个特定操作的快捷方式，但它并不能完全替代传统的工具，它的接口可能会随着版本的不同而发生变化，以提高可用性。如果你在脚本或 shell 管道中使用包管理命令，那么最好还是坚持使用 apt-get 和 apt-cache。</p>
+<p><strong><font size="5">获取帮助</font></strong></p>
+<p>除了基于 web 的文档，请记住我们可以通过 shell 从 Unix 手册页（通常称为 man 页面）中获得大多数的命令。比如要阅读某页，可以使用 man：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">man page</span><br></pre></td></tr></table></figure>
+
+
+<p>在 man 中，你可以用箭头键导航。按 / 搜索页面内的文本，使用 q 退出。</p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/v2-e5d93022e0f6e7ed3ee06d2e0011547a_r.jpg" alt="img"></p>
+<p><strong><font size="5">结论和进一步的阅读</font></strong></p>
+<p>本指南通过对多个系统间进行交叉对比概述了一下包管理系统的基本操作，但只涉及了这个复杂主题的表面。对于特定系统更详细的信息，可以参考以下资源：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://www.digitalocean.com/community/tutorials/ubuntu-and-debian-package-management-essentials">这份指南</a> 详细介绍了 Ubuntu 和 Debian 的软件包管理。</li>
+<li>这里有一份 CentOS 官方的指南 <a target="_blank" rel="noopener" href="https://www.centos.org/docs/5/html/yum/">使用 yum 管理软件</a></li>
+<li>这里有一个有关 Fedora 的 dnf 的 <a target="_blank" rel="noopener" href="https://fedoraproject.org/wiki/Dnf">wifi 页面</a> 以及一份有关 dnf <a target="_blank" rel="noopener" href="https://dnf.readthedocs.org/en/latest/index.html">官方的手册</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.digitalocean.com/community/tutorials/how-to-manage-packages-on-freebsd-10-1-with-pkg">这份指南</a> 讲述了如何使用 pkg 在 FreeBSD 上进行包管理</li>
+<li>这本 <a target="_blank" rel="noopener" href="https://www.freebsd.org/doc/handbook/">FreeBSD Handbook</a> 有一节讲述了<a target="_blank" rel="noopener" href="https://www.freebsd.org/doc/handbook/ports-using.html">如何使用 Ports 集合</a></li>
+</ul>
+<p>via: <a target="_blank" rel="noopener" href="https://www.digitalocean.com/community/tutorials/package-management-basics-apt-yum-dnf-pkg">https://www.digitalocean.com/community/tutorials/package-management-basics-apt-yum-dnf-pkg</a></p>
+<p>译者后记：</p>
+<p>从经典的 configure &amp;&amp; make &amp;&amp; make install 三部曲到 dpkg，从需要手处理依赖关系的 dpkg 到全自动化的 apt-get，恩~，你有没有想过接下来会是什么？译者只能说可能会是 Snaps，如果你还没有听过这个东东，你也许需要关注下这个公众号了：<strong>Snapcraft</strong></p>
+<p>作者：<a target="_blank" rel="noopener" href="https://www.digitalocean.com/community/users/bpb">Brennen Bearnes </a>译者：<a target="_blank" rel="noopener" href="https://github.com/Snapcrafter">Snapcrafter</a> 校对：<a target="_blank" rel="noopener" href="https://github.com/wxy">wxy</a></p>
+<h1 id="vim编辑器"><a href="#vim编辑器" class="headerlink" title="vim编辑器"></a>vim编辑器</h1><p><strong><font size="5">基本介绍</font></strong></p>
+<p>所有的Linux 系统都会内建vi 文本编辑器。</p>
+<p>Vim 具有程序编辑的能力，可以看做是Vi 的增强版本，可以主动的以字体颜色辨别语法的正确性。</p>
+<p><strong><font size="5">三种常见模式</font></strong></p>
+<p><strong><font size="5">正常模式</font></strong></p>
+<p>在正常模式下，我们可以使用快捷键。</p>
+<p>以vim 打开一个档案就直接进入一般模式了(这是默认的模式)。在这个模式中， 你可以使用<code>上下左右</code>按键来移动光标，你可以使用<code>删除字符</code>或<code>删除整行</code>来处理档案内容， 也可以使用<code>复制、贴上</code>来处理你的文件数据。</p>
+<p><strong><font size="5">编辑模式</font></strong></p>
+<p>又叫插入模式，可以输入内容。</p>
+<p>按下i, I, o, O, a, A, r, R 等任何一个字母之后才会进入编辑模式, 一般来说按i 即可。</p>
+<p><strong><font size="5">命令行模式</font></strong></p>
+<p>在这个模式当中， 可以读取、存盘、替换、离开vim 、显示行号等的动作。</p>
+<p><strong><font size="5">相互转换</font></strong></p>
+<img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/image-20201221162438665.png" alt="image-20201221162438665" style="zoom:67%;">
+
+<p><strong><font size="5">快捷键图</font></strong></p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/vim%E9%94%AE%E7%9B%98%E5%9B%BE.png" alt="vim键盘图"></p>
+<p><strong><font size="5">使用案例</font></strong></p>
+<ol>
+<li>拷贝当前行<code>yy</code> , 拷贝当前行向下的5 行<code>5yy</code>，并粘贴（p）。</li>
+<li>删除当前行<code>dd</code> , 删除当前行向下的5 行<code>5dd</code></li>
+<li>在文件中查找某个单词[命令行下<code>/关键字</code>， 回车查找, 输入<code>n</code> 就是查找下一个],查询<br>hello.</li>
+<li>设置文件的行号，取消文件的行号。命令行下<code>: set nu</code> 和<code>:set nonu</code></li>
+<li>编辑/etc/profile 文件，使用快捷键到底文档的最末行<code>G</code>和最首行<code>gg</code>,注意这些都是在正常模<br>式下执行的。</li>
+<li>在一个文件中输入”hello” ,然后又撤销这个动作，在正常模式下输入<code>u</code></li>
+<li>编辑/etc/profile 文件，并将光标移动到第20 行shift+g<ol>
+<li>第一步：显示行号<code>:set nu</code></li>
+<li>第二步：输入<code>20 </code>这个数</li>
+<li>第三步: 输入<code>shift+g</code></li>
+</ol>
+</li>
+</ol>
+<h1 id="用户管理"><a href="#用户管理" class="headerlink" title="用户管理"></a>用户管理</h1><ol>
+<li><p>Linux 系统是一个多用户多任务的操作系统。</p>
+</li>
+<li><p>Linux 的用户需要至少要属于一个组。</p>
+</li>
+</ol>
+<p><strong><font size="5">添加用户</font></strong></p>
+<p><code>useradd [选项] 用户名</code></p>
+<ol>
+<li>当创建用户成功后，会自动的创建和用户同名的家目录</li>
+<li>也可以通过useradd -d 指定目录新的用户名，给新创建的用户指定家目录，如<code>useradd -d /home/mark thomas</code></li>
+<li>增加用户时直接加上组，<code>useradd -g 用户组 用户名</code></li>
+</ol>
+<p><strong><font size="5">指定密码</font></strong></p>
+<p><code>passwd 用户名</code></p>
+<p><strong><font size="5">删除用户</font></strong></p>
+<p>删除用户xm，但是要保留家目录</p>
+<p><code>userdel xm</code></p>
+<p>删除用户xh 以及用户主目录</p>
+<p><code>userdel -r xh</code></p>
+<p>注意：在删除用户时，我们一般不会将家目录删除。</p>
+<p><strong><font size="5">修改用户</font></strong></p>
+<p><code>usermod -g 用户组 -d 家目录</code></p>
+<p>附：usermod详细参数</p>
+<p>语　　法：usermod [-LU][-c &lt;备注&gt;][-d &lt;登入目录&gt;][-e &lt;有效期限&gt;][- f &lt;缓冲天数&gt;][-g &lt;群组&gt;][-G &lt;群组&gt;][-l &lt;帐号名称&gt;][-s ][-u ] [用户帐号]</p>
+<p>补充说明：usermod可用来修改用户帐号的各项设定。</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-c&lt;备注&gt;</td>
+<td>修改用户帐号的备注文字。</td>
+</tr>
+<tr>
+<td>-d登入目录&gt;</td>
+<td>修改用户登入时的目录。</td>
+</tr>
+<tr>
+<td>-e&lt;有效期限&gt;</td>
+<td>修改帐号的有效期限。</td>
+</tr>
+<tr>
+<td>-f&lt;缓冲天数&gt;</td>
+<td>修改在密码过期后多少天即关闭该帐号。</td>
+</tr>
+<tr>
+<td>-g&lt;群组&gt;</td>
+<td>修改用户所属的群组。</td>
+</tr>
+<tr>
+<td>-G&lt;群组&gt;</td>
+<td>修改用户所属的附加群组。</td>
+</tr>
+<tr>
+<td>-l&lt;帐号名称&gt;</td>
+<td>修改用户帐号名称。</td>
+</tr>
+<tr>
+<td>-L</td>
+<td>锁定用户密码，使密码无效。</td>
+</tr>
+<tr>
+<td>-s</td>
+<td>修改用户登入后所使用的shell。</td>
+</tr>
+<tr>
+<td>-u</td>
+<td>修改用户ID。</td>
+</tr>
+<tr>
+<td>-U</td>
+<td>解除密码锁定。</td>
+</tr>
+</tbody></table>
+<p>-c&lt;备注&gt; 　修改用户帐号的备注文字。<br>-d登入目录&gt; 　修改用户登入时的目录。<br>-e&lt;有效期限&gt; 　修改帐号的有效期限。<br>-f&lt;缓冲天数&gt; 　修改在密码过期后多少天即关闭该帐号。<br>-g&lt;群组&gt; 　修改用户所属的群组。<br>-G&lt;群组&gt; 　修改用户所属的附加群组。<br>-l&lt;帐号名称&gt; 　修改用户帐号名称。<br>-L 　锁定用户密码，使密码无效。<br>-s 　修改用户登入后所使用的shell。<br>-u 　修改用户ID。<br>-U 　解除密码锁定。</p>
+<p><strong><font size="5">查询用户信息</font></strong></p>
+<p><code>id 用户名</code></p>
+<p><strong><font size="5">切换用户</font></strong></p>
+<p><code>su - 用户名</code></p>
+<p>注意：</p>
+<ol>
+<li>从权限高的用户切换到权限低的用户，不需要输入密码，反之需要。</li>
+<li>当需要返回到原来用户时，使用<code>exit</code>指令</li>
+</ol>
+<p><strong><font size="5">用户组</font></strong></p>
+<table>
+<thead>
+<tr>
+<th>作用</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>增加组</td>
+<td><code>groupadd 组名</code></td>
+</tr>
+<tr>
+<td>删除组</td>
+<td><code>groupdel 组名</code></td>
+</tr>
+<tr>
+<td>增加用户时直接加上组</td>
+<td><code>useradd -g 用户组 用户名</code></td>
+</tr>
+<tr>
+<td>修改用户的组</td>
+<td><code>usermod -g 用户组 用户名</code></td>
+</tr>
+</tbody></table>
+<p><strong><font size="5">/etc/passwd 文件</font></strong></p>
+<p>用户（user）的配置文件，记录用户的各种信息<br>每行的含义：用户名:口令:用户标识号:组标识号:注释性描述:主目录:登录Shell</p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/image-20201222203422901.png" alt="image-20201222203422901"></p>
+<p><strong><font size="5">/etc/shadow 文件</font></strong></p>
+<p>口令的配置文件<br>每行的含义：登录名:加密口令:最后一次修改时间:最小时间间隔:最大时间间隔:警告时间:不活动<br>时间:失效时间:标志</p>
+<p><strong><font size="5">/etc/group 文件</font></strong></p>
+<p>组(group)的配置文件，记录Linux 包含的组的信息<br>每行含义：组名:口令:组标识号:组内用户列表</p>
+<p><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/image-20201222203511222.png" alt="image-20201222203511222"></p>
+<h1 id="动态链接库"><a href="#动态链接库" class="headerlink" title="动态链接库"></a>动态链接库</h1><p><strong><font size="5">so文件依赖路径</font></strong></p>
+<p>方法一：在配置文件/etc/ld.so.conf中指定动态库搜索路径。<br>vi /etc/ld.so.conf<br>添加 lib目录<br>ldconfig </p>
+<p><code>ldconfig -v</code>查看有没有生效</p>
+<p>生效了，但还是不成功。</p>
+<p>无效，存疑。</p>
+<p>方法二：通过环境变量LD_LIBRARY_PATH指定动态库搜索路径。 </p>
+<p>在/etc/profile中加入</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">LD_LIBRARY_PATH&#x3D;&#x2F;home&#x2F;root&#x2F;test&#x2F;lib:&#x2F;home&#x2F;root&#x2F;test&#x2F;lib</span><br><span class="line">export LD_LIBRARY_PATH</span><br></pre></td></tr></table></figure>
+<p><code>/home/root/test/lib</code>为路径</p>
+<p>并且 执行<code>source /etc/profile</code></p>
+<p><code>export LD_LIBRARY_PATH=”LD_LIBRARY_PATH:/opt/” </code></p>
+<p>方法三：在编译目标代码时指定该程序的动态库搜索路径。 </p>
+<p>还可以在编译目标代码时指定程序的动态库搜索路径。通过gcc 的参数”-Wl,-rpath,”指定</p>
+<h1 id="禁止Debian-10自动休眠"><a href="#禁止Debian-10自动休眠" class="headerlink" title="禁止Debian 10自动休眠"></a>禁止Debian 10自动休眠</h1><p>如果重启之后，从来都没有登陆，就不会出现系统自动休眠的情况。</p>
+<p>观察系统日志，发现类似如下的内容：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Feb 25 22:15:38 server NetworkManager[737]: &lt;info&gt;  [1582668938.0193] manager: sleep: sleep requested (sleeping: no  enabled: yes)</span><br><span class="line">Feb 25 22:15:38 server NetworkManager[737]: &lt;info&gt;  [1582668938.0239] manager: NetworkManager state is now ASLEEP</span><br><span class="line">Feb 25 22:15:38 server whoopsie[1025]: [22:15:38] offline</span><br><span class="line">Feb 25 22:15:38 server gnome-shell[956]: Screen lock is locked down, not locking</span><br><span class="line">Feb 25 22:15:38 server systemd[1]: Reached target Sleep.</span><br><span class="line">Feb 25 22:15:38 server systemd[1]: Starting Suspend...</span><br><span class="line">Feb 25 22:15:38 server kernel: [ 1235.212537] PM: suspend entry (s2idle)</span><br><span class="line">Feb 25 22:15:38 server systemd-sleep[1705]: Suspending system...</span><br></pre></td></tr></table></figure>
+<p>发现是触发了systemd的自动休眠功能，检查休眠功能的状态以及历史记录，如下：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl status sleep.target</span><br><span class="line">● sleep.target - Sleep</span><br><span class="line">    Loaded: loaded (&#x2F;lib&#x2F;systemd&#x2F;system&#x2F;sleep.target; static; vendor preset: enabled)</span><br><span class="line">    Active: inactive (dead)</span><br><span class="line">      Docs: man:systemd.special(7)</span><br><span class="line">Feb 24 13:18:08 xps systemd[1]: Reached target Sleep.</span><br><span class="line">Feb 26 13:29:31 xps systemd[1]: Stopped target Sleep.</span><br><span class="line">Feb 26 13:29:57 xps systemd[1]: Reached target Sleep.</span><br><span class="line">Feb 26 13:30:19 xps systemd[1]: Stopped target Sleep.</span><br></pre></td></tr></table></figure>
+<p>普通桌面应用这个情况问题不大，但是如果是作为服务器使用的时候，我们一般远程访问系统，这个功能就会导致我们无法远程控制服务器，因此我们需要关闭这个功能。</p>
+<p>执行关闭休眠功能的命令，如下：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ sudo systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target</span><br><span class="line">Created symlink &#x2F;etc&#x2F;systemd&#x2F;system&#x2F;sleep.target → &#x2F;dev&#x2F;null.</span><br><span class="line">Created symlink &#x2F;etc&#x2F;systemd&#x2F;system&#x2F;suspend.target → &#x2F;dev&#x2F;null.</span><br><span class="line">Created symlink &#x2F;etc&#x2F;systemd&#x2F;system&#x2F;hibernate.target → &#x2F;dev&#x2F;null.</span><br><span class="line">Created symlink &#x2F;etc&#x2F;systemd&#x2F;system&#x2F;hybrid-sleep.target → &#x2F;dev&#x2F;null.</span><br></pre></td></tr></table></figure>
+<p>再次观察系统休眠状态，如下：</p>
+ <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$ systemctl status sleep.target</span><br><span class="line">● sleep.target</span><br><span class="line">   Loaded: masked (Reason: Unit sleep.target is masked.)</span><br><span class="line">   Active: inactive (dead)</span><br></pre></td></tr></table></figure>
+<p>发现自动休眠功能已经被关闭，不会出现自动休眠导致远程控制无法访问的情况了。 </p>
+<h1 id="取消Debian系统自动锁屏"><a href="#取消Debian系统自动锁屏" class="headerlink" title="取消Debian系统自动锁屏"></a>取消Debian系统自动锁屏</h1><p>自动锁屏和自动休眠不一样</p>
+<p>Linux的自动锁屏功能，会在你离开屏幕的两分钟，甚至更短的时候内，将屏幕锁住，需要输入密码才能进入Linux系统。</p>
+<p>可按下面的设置，关掉Linux自动锁屏功能</p>
+<p>settings –&gt;  Power –&gt;  PowerSaving –&gt;  Blank screen –&gt; never</p>
+<h1 id="安装java"><a href="#安装java" class="headerlink" title="安装java"></a>安装java</h1><p>下面是针对的是版本 Java 8 Update 73 (8u73) 的安装说明。如果您安装的是其他版本，请确保在终端上键入命令时对版本号进行相应的更改。<strong>示例</strong>：对于 Java 8u79，将 <strong>8u73</strong> 替换为 <strong>8u79</strong>。请注意，就如在前面的示例中一样，版本号的前面有时会附加字母 <code>u</code>，有时会附加下划线；例如 <code>jre1.8.0_73</code>。<br><strong>关于根访问权限的说明：</strong>要在系统范围的位置（例如 /usr/local）安装 Java，您必须以 root 用户身份登录以获取必要权限。如果您不具有超级用户访问权限，请将 Java 安装在您的主目录中，或者安装在您具有写入权限的子目录中。</p>
+<ol>
+<li><p><strong>切换到所需的安装目录。</strong>键入：<br><code>cd </code><em>directory_path_name</em><br>例如，要将软件安装到 /usr/java/ 目录中，请键入：<br><code>cd /usr/java/</code></p>
+</li>
+<li><p>将 .tar.gz 档案二进制文件移到当前目录。<strong>解压缩 tarball 并安装 Java</strong><br><code>tar zxvf jre-8u73-linux-x64.tar.gz</code></p>
+</li>
+<li><p>Java 文件将安装在当前目录中名为 jre1.8.0_73 的目录内。在本示例中，Java 将安装在 <code>/usr/java/jre1.8.0_73</code> 目录中。当安装完成时，您将看到 <strong>Done</strong>（完成）字样。</p>
+</li>
+<li><p>如果要节省磁盘空间，<strong>请删除 <code>.tar.gz</code> 文件</strong>。</p>
+</li>
+<li><p>设置环境变量  修改 vi /etc/profile</p>
+</li>
+</ol>
+<p>在 profile 文件中添加如下内容并保存：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">JAVA_HOME&#x3D;&#x2F;usr&#x2F;local&#x2F;java&#x2F;jdk1.8.0_151        </span><br><span class="line">JRE_HOME&#x3D;&#x2F;usr&#x2F;local&#x2F;java&#x2F;jdk1.8.0_151&#x2F;jre     </span><br><span class="line">CLASS_PATH&#x3D;.:$JAVA_HOME&#x2F;lib&#x2F;dt.jar:$JAVA_HOME&#x2F;lib&#x2F;tools.jar:$JRE_HOME&#x2F;lib</span><br><span class="line">PATH&#x3D;$PATH:$JAVA_HOME&#x2F;bin:$JRE_HOME&#x2F;bin</span><br><span class="line">export JAVA_HOME JRE_HOME CLASS_PATH PATH</span><br></pre></td></tr></table></figure>
+<p>注意：其中 JAVA_HOME， JRE_HOME 请根据自己的实际安装路径及 JDK 版本配置。</p>
+<ol start="6">
+<li>让修改生效：<code>source /etc/profile</code></li>
+</ol>
+<h1 id="终端颜色"><a href="#终端颜色" class="headerlink" title="终端颜色"></a>终端颜色</h1><p>先cd到用户主目录下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd ~</span><br><span class="line">1</span><br></pre></td></tr></table></figure>
+<p>然后vim 修改.profile文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vim .profile</span><br><span class="line">1</span><br></pre></td></tr></table></figure>
+<p>添加并保存：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">if [ -f &quot;$HOME&#x2F;.bashrc&quot; ];then</span><br><span class="line">. &quot;$HOME&#x2F;.bashrc&quot;</span><br><span class="line">fi</span><br><span class="line">123</span><br></pre></td></tr></table></figure>
+<p>再修改.bashrc文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">vim &#x2F;.bashrc</span><br><span class="line">1</span><br></pre></td></tr></table></figure>
+<p>添加并保存：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"> alias ls&#x3D;&#39;ls --color&#39;</span><br><span class="line">1</span><br></pre></td></tr></table></figure>
+<p>最后将重新source一下即可</p>
+<h1 id="开机启动"><a href="#开机启动" class="headerlink" title="开机启动"></a>开机启动</h1><p>在网上看了很多开机自启说的都不清楚，自己总结写了一份开机自启<br>编写运行sh脚本如下：<br><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/20201019164217110.jpg" alt="sh脚本命令"></p>
+<p>#在/etc/profile 文件打开最下面的就是你服务器上的JAVA环境<br>复制粘贴到脚本即可</p>
+<p>vim /etc/rc.local #编辑开机启动文件</p>
+<p>在最后一行加入sh脚本所在目录<br><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/20201019164254342.jpg" alt="开机启动"></p>
+<p>chmod +x /etc/rc.local #授予文件执行权限<br>chmod +x /soft/run.jar #授予文件执行权限</p>
+<p>reboot重启即可</p>
+<p>netstat -lnp|grep 8001 #查看8001端口是否有程序在运行<br><img src="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/20201019164320773.jpg" alt="在这里插入图片描述"></p>
+<p>kill -9 3784 （3784为Java进程，根据实际改变） #停止此端口程序运行</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/" rel="prev" title="vs操作相关">
+      <i class="fa fa-chevron-left"></i> vs操作相关
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/01/Win%E6%8A%80%E5%B7%A7/git/" rel="next" title="git">
+      git <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux%E5%90%84%E4%B8%AA%E5%8F%91%E8%A1%8C%E7%89%88%E6%9C%AC%E5%AF%B9%E6%AF%94%E4%B8%8E%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">Linux各个发行版本对比与简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Linux-%E5%8C%85%E7%AE%A1%E7%90%86%E5%9F%BA%E7%A1%80"><span class="nav-number">2.</span> <span class="nav-text">Linux 包管理基础</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vim%E7%BC%96%E8%BE%91%E5%99%A8"><span class="nav-number">3.</span> <span class="nav-text">vim编辑器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86"><span class="nav-number">4.</span> <span class="nav-text">用户管理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%BA%93"><span class="nav-number">5.</span> <span class="nav-text">动态链接库</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%A6%81%E6%AD%A2Debian-10%E8%87%AA%E5%8A%A8%E4%BC%91%E7%9C%A0"><span class="nav-number">6.</span> <span class="nav-text">禁止Debian 10自动休眠</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8F%96%E6%B6%88Debian%E7%B3%BB%E7%BB%9F%E8%87%AA%E5%8A%A8%E9%94%81%E5%B1%8F"><span class="nav-number">7.</span> <span class="nav-text">取消Debian系统自动锁屏</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E8%A3%85java"><span class="nav-number">8.</span> <span class="nav-text">安装java</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%88%E7%AB%AF%E9%A2%9C%E8%89%B2"><span class="nav-number">9.</span> <span class="nav-text">终端颜色</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%80%E6%9C%BA%E5%90%AF%E5%8A%A8"><span class="nav-number">10.</span> <span class="nav-text">开机启动</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lemonforce</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonforce</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/three-waves.min.js"></script>
+    <script defer src="/lib/three/canvas_sphere.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'gzXD9zEDA40Tphr5SR3SdW1Q-gzGzoHsz',
+      appKey     : 'OhkBCtuVUlWsxS1Bm4jQVLgX',
+      placeholder: "有啥想说的，尽情留言",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

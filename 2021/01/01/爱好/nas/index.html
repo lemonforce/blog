@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lemonforce.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;shuoliuchina&#x2F;p&#x2F;11262569.html 硬件： Raspberry Pi 4 移动硬盘，USB3.0接口  操作系统： Rasbian">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NAS搭建">
+<meta property="og:url" content="https://lemonforce.github.io/2021/01/01/%E7%88%B1%E5%A5%BD/nas/index.html">
+<meta property="og:site_name" content="lemonforce">
+<meta property="og:description" content="https:&#x2F;&#x2F;www.cnblogs.com&#x2F;shuoliuchina&#x2F;p&#x2F;11262569.html 硬件： Raspberry Pi 4 移动硬盘，USB3.0接口  操作系统： Rasbian">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E7%88%B1%E5%A5%BD/nas/1257172-20190729095301016-1348494623.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E7%88%B1%E5%A5%BD/nas/1257172-20190729095411497-1315698050.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E7%88%B1%E5%A5%BD/nas/1257172-20190729095421336-284799667.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E7%88%B1%E5%A5%BD/nas/1257172-20190730102312950-101370420.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E7%88%B1%E5%A5%BD/nas/1257172-20190730102513235-1481605736.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E7%88%B1%E5%A5%BD/nas/1257172-20190730102923387-96414979.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E7%88%B1%E5%A5%BD/nas/image-20201228192219810.png">
+<meta property="article:published_time" content="2021-01-01T05:08:45.000Z">
+<meta property="article:modified_time" content="2021-01-02T12:00:58.986Z">
+<meta property="article:author" content="lemonforce">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lemonforce.github.io/2021/01/01/%E7%88%B1%E5%A5%BD/nas/1257172-20190729095301016-1348494623.png">
+
+<link rel="canonical" href="https://lemonforce.github.io/2021/01/01/%E7%88%B1%E5%A5%BD/nas/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>NAS搭建 | lemonforce</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">lemonforce</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lemonforce.github.io/2021/01/01/%E7%88%B1%E5%A5%BD/nas/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lemonforce">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lemonforce">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          NAS搭建
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-01 13:08:45" itemprop="dateCreated datePublished" datetime="2021-01-01T13:08:45+08:00">2021-01-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-01-02 20:00:58" itemprop="dateModified" datetime="2021-01-02T20:00:58+08:00">2021-01-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%88%B1%E5%A5%BD/" itemprop="url" rel="index"><span itemprop="name">爱好</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/01/01/%E7%88%B1%E5%A5%BD/nas/" class="post-meta-item leancloud_visitors" data-flag-title="NAS搭建" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/01/%E7%88%B1%E5%A5%BD/nas/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/01/%E7%88%B1%E5%A5%BD/nas/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/shuoliuchina/p/11262569.html">https://www.cnblogs.com/shuoliuchina/p/11262569.html</a></p>
+<h2 id="硬件："><a href="#硬件：" class="headerlink" title="硬件："></a>硬件：</h2><ul>
+<li>Raspberry Pi 4</li>
+<li>移动硬盘，USB3.0接口</li>
+</ul>
+<h2 id="操作系统："><a href="#操作系统：" class="headerlink" title="操作系统："></a>操作系统：</h2><ul>
+<li>Rasbian</li>
+</ul>
+<h2 id="树莓派操作系统的安装："><a href="#树莓派操作系统的安装：" class="headerlink" title="树莓派操作系统的安装："></a>树莓派操作系统的安装：</h2><p>这里只提一下官方的用NOOBS安装Rasbian系统的安装方法。</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="https://www.raspberrypi.org/downloads/noobs/">下载NOOBS</a>；</li>
+<li>将压缩包解压到SD卡；</li>
+<li>连接好树莓派的各个硬件，包括鼠标键盘显示器，插入刚刚写入NOOBS文件的SD卡；</li>
+<li>接通电源，按提示选择即可</li>
+</ol>
+<h2 id="更新Vim（这个步骤无太大必要，可以忽略）："><a href="#更新Vim（这个步骤无太大必要，可以忽略）：" class="headerlink" title="更新Vim（这个步骤无太大必要，可以忽略）："></a>更新Vim（这个步骤无太大必要，可以忽略）：</h2><p>树莓派自带的Vim不是很好用，我们可以更新一下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install vim</span><br></pre></td></tr></table></figure>
+<h2 id="使用远程桌面："><a href="#使用远程桌面：" class="headerlink" title="使用远程桌面："></a>使用远程桌面：</h2><p>在树莓派安装xrdp，可以用Windows自带的远程桌面访问树莓派：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install xrdp</span><br></pre></td></tr></table></figure>
+<p>用桌面远程访问之前需要先查询树莓派的ip地址：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ifconfig</span><br></pre></td></tr></table></figure>
+<p>返回的内容中会有树莓派的ip，如下图。</p>
+<p><a target="_blank" rel="noopener" href="https://img2018.cnblogs.com/blog/1257172/201907/1257172-20190729095301016-1348494623.png"><img src="/2021/01/01/%E7%88%B1%E5%A5%BD/nas/1257172-20190729095301016-1348494623.png" alt="img"></a></p>
+<p>有了树莓派的ip，我们就可以在Windows电脑的远程桌面功能访问树莓派了。</p>
+<p><a target="_blank" rel="noopener" href="https://img2018.cnblogs.com/blog/1257172/201907/1257172-20190729095411497-1315698050.png"><img src="/2021/01/01/%E7%88%B1%E5%A5%BD/nas/1257172-20190729095411497-1315698050.png" alt="img"></a></p>
+<p>远程登陆的用户名为 pi ，密码为系统登陆的密码。</p>
+<p><a target="_blank" rel="noopener" href="https://img2018.cnblogs.com/blog/1257172/201907/1257172-20190729095421336-284799667.png"><img src="/2021/01/01/%E7%88%B1%E5%A5%BD/nas/1257172-20190729095421336-284799667.png" alt="img"></a></p>
+<p>这里提一嘴，远程操控和直接用树莓派链接的显示器键盘鼠标是互不干扰的。你在远程桌面进行的操作，树莓派直连的显示器上面是看不见的。同样，你在树莓派直连的显示器上面操作，远程桌面也是看不见的。而且远程操控是没有很多权限的，比如远程开关机，甚至远程极性一些配置，即便使用root用户登录也不行。</p>
+<h2 id="挂载移动硬盘："><a href="#挂载移动硬盘：" class="headerlink" title="挂载移动硬盘："></a>挂载移动硬盘：</h2><p>旧版的树莓派系统需要手动挂载硬盘，操作极其繁琐，网上有很多相关的教程。不过新版树莓派系统似乎已经解决了这个问题，硬盘可以自动挂载，就不必担心硬盘挂载的问题了，随插随用即可。</p>
+<p>需要注意的是，Windows和Linux系统的硬盘文件系统是不一样的。Windows系统下的文件系统多是ntfs和fat，而Linux则很多样化，主流为ext4。如果移动硬盘的文件系统是ntfs的话，树莓派是不能直接识别出来的，需要安装一个文件系统服务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install ntfs-3g</span><br></pre></td></tr></table></figure>
+<p>安装完成后，硬盘会自动挂载到 /media/pi 目录下。</p>
+<h2 id="使用samba："><a href="#使用samba：" class="headerlink" title="使用samba："></a>使用samba：</h2><p>首先安装samba：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get update    #更新一下源</span><br><span class="line">sudo apt-get install samba samba-common-bin    #安装 samba</span><br></pre></td></tr></table></figure>
+<p>安装完成后，配置一下 /etc/samba/smb.conf 文件，可以用nano进行编辑：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nano &#x2F;etc&#x2F;samba&#x2F;smb.conf</span><br></pre></td></tr></table></figure>
+<p>注：nano可以通过ctrl+y（上一页）和ctrl+v（下一页）实现翻页。</p>
+<p>在其最后插入下面的命令，其中 /media/pi/MyBook 是我设置的共享文件目录，将其设置为你需要共享的目录即可：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">[public]</span><br><span class="line">   comment &#x3D; public storage</span><br><span class="line">   path &#x3D; &#x2F;media&#x2F;pi&#x2F;MyBook</span><br><span class="line">   valid users &#x3D; pi</span><br><span class="line">   read only &#x3D; no</span><br><span class="line">   create mask &#x3D; 0777</span><br><span class="line">   directory mask &#x3D; 0777</span><br><span class="line">   guest ok &#x3D; no</span><br><span class="line">   browseable &#x3D; yes</span><br></pre></td></tr></table></figure>
+<p>参数说明：</p>
+<ul>
+<li>comment：共享文件夹说明；</li>
+<li>path：共享文件夹目录；</li>
+<li>valid users：有效用户；</li>
+<li>read only：是否只读；</li>
+<li>create mask：创建文件的权限；</li>
+<li>directory mask：创建文件夹的权限；</li>
+<li>guest ok：是否允许访客访问；</li>
+<li>browseable：是否可见。</li>
+</ul>
+<p>其中valid users即pi为有效用户，还需要把它添加到samba中（会提示输入密码，建议把密码设置成系统登陆的密码，不至于密码太多而混淆。不过处于安全考虑，也可以设置成不一样的。）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo smbpasswd -a pi</span><br></pre></td></tr></table></figure>
+<p>重启samba以生效配置：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo samba restart</span><br></pre></td></tr></table></figure>
+<p>注：samba默认开机自启，无需为重启担心。</p>
+<p>另：有很多教程都是使用 sudo /etc/init.d/samba restart 命令重启samba，但是或许是新版本samba的缘故，在那个目录里面找不到samba文件，这里存疑，不过用正文里面的命令重启samba是没问题可以用的。</p>
+<p>设置文件权限：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo chmod -R 777 &#x2F;mnt&#x2F;udisk</span><br></pre></td></tr></table></figure>
+
+
+<h2 id="访问共享文件："><a href="#访问共享文件：" class="headerlink" title="访问共享文件："></a>访问共享文件：</h2><h3 id="Windows系统："><a href="#Windows系统：" class="headerlink" title="Windows系统："></a>Windows系统：</h3><p>单次访问：</p>
+<p>在资源管理器的地址栏中输入： \192.168.0.105\public ，将其中的 192.168.0.105 替换为你自己的树莓派ip。</p>
+<p>过程中需要输入用户名和密码。用户名是pi，密码是前面设置的samba的密码。</p>
+<p> 然后你就可以在局域网内使用任何一台Windows设备访问硬盘啦。</p>
+<p>永久访问：</p>
+<p>上面的方法只能一次性访问移动硬盘，以后需要继续打开相关文件时，还需要重新输入ip和一连串的内容，操作比较繁琐。这里介绍另外一种方法，可以将树莓派上的移动硬盘永久挂载到文件管理器中。</p>
+<p>首先，右键“此电脑”图标，或者在文件管理器的“此电脑”点右键，然后选择映射网络驱动器：</p>
+<p><a target="_blank" rel="noopener" href="https://img2018.cnblogs.com/blog/1257172/201907/1257172-20190730102312950-101370420.png"><img src="/2021/01/01/%E7%88%B1%E5%A5%BD/nas/1257172-20190730102312950-101370420.png" alt="img"></a></p>
+<p>驱动器符号可以随意选择自己喜欢的，文件夹则依旧输入 \192.168.0.105\public ，同样地，记得将里面的 192.168.0.105 替换问你的树莓派的ip。</p>
+<p><a target="_blank" rel="noopener" href="https://img2018.cnblogs.com/blog/1257172/201907/1257172-20190730102513235-1481605736.png"><img src="/2021/01/01/%E7%88%B1%E5%A5%BD/nas/1257172-20190730102513235-1481605736.png" alt="img"></a></p>
+<p>然后输入密码点确定继续之类的就可以了。如果一切顺利，当打开文件资源管理器的时候，就可以看见挂载的树莓派硬盘图标了，以后就可以通过像操作本地磁盘一样使用硬盘啦：</p>
+<p><a target="_blank" rel="noopener" href="https://img2018.cnblogs.com/blog/1257172/201907/1257172-20190730102923387-96414979.png"><img src="/2021/01/01/%E7%88%B1%E5%A5%BD/nas/1257172-20190730102923387-96414979.png" alt="img"></a></p>
+<h3 id="Mac-OS："><a href="#Mac-OS：" class="headerlink" title="Mac OS："></a>Mac OS：</h3><p>首先声明，这个方法是网上看到的，估计可行。但是我没有Mac，没有亲自操作，具体细节还是不懂的。</p>
+<p>打开Finder，然后快捷键cmd+K，在服务器地址中填写 smb://192.168.0.105/public ，老样子，其中的 192.168.0.105 需要替换为你的树莓派的ip地址。然后点击连接即可。</p>
+<h3 id="iOS："><a href="#iOS：" class="headerlink" title="iOS："></a>iOS：</h3><p>在iPhone或者iPad上面下载FileExplorer应用。打开应用，点击右上角的+，然后选择Linux。然后输入ip还有账户密码，就可以远程访问了。</p>
+<p>另外一款名叫nPlayer的app也是可以用的。</p>
+<p>还有很多类似的app，就不赘述了。不过基本上没有发现免费的。</p>
+<h2 id="主要参考网站："><a href="#主要参考网站：" class="headerlink" title="主要参考网站："></a>主要参考网站：</h2><p><a target="_blank" rel="noopener" href="http://wiki.jikexueyuan.com/project/raspberry-pi/">树莓派使用指南</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/0fb0638fa061">树莓派局域网文件共享 | 树莓派小无相系列</a></p>
+<h1 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h1><p><img src="/2021/01/01/%E7%88%B1%E5%A5%BD/nas/image-20201228192219810.png" alt="image-20201228192219810"></p>
+<p>打开“控制面板”，“INTERNET 选项”，“安全”选项卡；</p>
+<p>点中间的“本地Intranet”，再点右边的“站点”；</p>
+<p>弹出“本地Intranet”窗口，点下边的“高级”，会再弹一个窗口，用于输入网址或者IP；</p>
+<p>输入对方的IP（这里是我的路由的IP），点“添加”就可以了。（可以用*号，如：192.168.1.*，就代表整个段了）</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/01/%E7%88%B1%E5%A5%BD/%E8%BF%85%E9%9B%B7%E8%BF%9C%E7%A8%8B%E4%B8%8B%E8%BD%BD/" rel="prev" title="迅雷远程下载">
+      <i class="fa fa-chevron-left"></i> 迅雷远程下载
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/01/%E7%88%B1%E5%A5%BD/hexo%E6%90%AD%E5%BB%BA/" rel="next" title="hexo搭建">
+      hexo搭建 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">硬件：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">操作系统：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A0%91%E8%8E%93%E6%B4%BE%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%AE%89%E8%A3%85%EF%BC%9A"><span class="nav-number">3.</span> <span class="nav-text">树莓派操作系统的安装：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0Vim%EF%BC%88%E8%BF%99%E4%B8%AA%E6%AD%A5%E9%AA%A4%E6%97%A0%E5%A4%AA%E5%A4%A7%E5%BF%85%E8%A6%81%EF%BC%8C%E5%8F%AF%E4%BB%A5%E5%BF%BD%E7%95%A5%EF%BC%89%EF%BC%9A"><span class="nav-number">4.</span> <span class="nav-text">更新Vim（这个步骤无太大必要，可以忽略）：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%EF%BC%9A"><span class="nav-number">5.</span> <span class="nav-text">使用远程桌面：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%82%E8%BD%BD%E7%A7%BB%E5%8A%A8%E7%A1%AC%E7%9B%98%EF%BC%9A"><span class="nav-number">6.</span> <span class="nav-text">挂载移动硬盘：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8samba%EF%BC%9A"><span class="nav-number">7.</span> <span class="nav-text">使用samba：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E5%85%B1%E4%BA%AB%E6%96%87%E4%BB%B6%EF%BC%9A"><span class="nav-number">8.</span> <span class="nav-text">访问共享文件：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Windows%E7%B3%BB%E7%BB%9F%EF%BC%9A"><span class="nav-number">8.1.</span> <span class="nav-text">Windows系统：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mac-OS%EF%BC%9A"><span class="nav-number">8.2.</span> <span class="nav-text">Mac OS：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#iOS%EF%BC%9A"><span class="nav-number">8.3.</span> <span class="nav-text">iOS：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E8%A6%81%E5%8F%82%E8%80%83%E7%BD%91%E7%AB%99%EF%BC%9A"><span class="nav-number">9.</span> <span class="nav-text">主要参考网站：</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number"></span> <span class="nav-text">遇到的问题</span></a></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lemonforce</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonforce</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/three-waves.min.js"></script>
+    <script defer src="/lib/three/canvas_sphere.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'gzXD9zEDA40Tphr5SR3SdW1Q-gzGzoHsz',
+      appKey     : 'OhkBCtuVUlWsxS1Bm4jQVLgX',
+      placeholder: "有啥想说的，尽情留言",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

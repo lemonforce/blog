@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lemonforce.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="vs操作相关前言用#4敲出 12345678910#define _CRT_SECURE_NO_WARNINGS#include &lt;iostream&gt;using namespace std;int main(void)&amp;#123;        return 0;&amp;#125; 实现过程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="vs操作相关">
+<meta property="og:url" content="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/index.html">
+<meta property="og:site_name" content="lemonforce">
+<meta property="og:description" content="vs操作相关前言用#4敲出 12345678910#define _CRT_SECURE_NO_WARNINGS#include &lt;iostream&gt;using namespace std;int main(void)&amp;#123;        return 0;&amp;#125; 实现过程">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/1503449-20181101211806968-2139010783.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/1503449-20181101211824130-1100467459.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/1503449-20181101212241615-1764523664.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/1503449-20181101212917359-896329173.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/1503449-20181101212933764-1735263839.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/20180406161328715">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/20180406161027464">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/20180406161055396">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/20180406161641156">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/20180406161740870">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/image-20210427094450542.png">
+<meta property="article:published_time" content="2021-01-01T10:54:05.000Z">
+<meta property="article:modified_time" content="2021-04-27T01:45:10.538Z">
+<meta property="article:author" content="lemonforce">
+<meta property="article:tag" content="VS">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/1503449-20181101211806968-2139010783.png">
+
+<link rel="canonical" href="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>vs操作相关 | lemonforce</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">lemonforce</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lemonforce.github.io/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lemonforce">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lemonforce">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          vs操作相关
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-01 18:54:05" itemprop="dateCreated datePublished" datetime="2021-01-01T18:54:05+08:00">2021-01-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-04-27 09:45:10" itemprop="dateModified" datetime="2021-04-27T09:45:10+08:00">2021-04-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%85%8D%E7%BD%AE/" itemprop="url" rel="index"><span itemprop="name">配置</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/" class="post-meta-item leancloud_visitors" data-flag-title="vs操作相关" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="vs操作相关"><a href="#vs操作相关" class="headerlink" title="vs操作相关"></a>vs操作相关</h1><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>用#4敲出</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _CRT_SECURE_NO_WARNINGS</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="实现过程"><a href="#实现过程" class="headerlink" title="实现过程"></a>实现过程</h2><p>工具→代码片段管理器→语言：Visual C++→复制位置路径→编写代码片段→保存后重启VS。</p>
+<h2 id="上机操作"><a href="#上机操作" class="headerlink" title="上机操作"></a>上机操作</h2><h3 id="打开工具"><a href="#打开工具" class="headerlink" title="打开工具"></a>打开工具</h3><p><img src="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/1503449-20181101211806968-2139010783.png" alt="img"></p>
+<h3 id="进入代码片段管理器"><a href="#进入代码片段管理器" class="headerlink" title="进入代码片段管理器"></a>进入代码片段管理器</h3><p><img src="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/1503449-20181101211824130-1100467459.png" alt="img"></p>
+<h3 id="vs操作相关-1"><a href="#vs操作相关-1" class="headerlink" title="vs操作相关"></a>vs操作相关</h3><p>打开资源管理器，将复制的路径粘贴，到达代码片段的根目录。</p>
+<p><img src="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/1503449-20181101212241615-1764523664.png" alt="img"></p>
+<p>双击#4.snippent文件经行简单的修改：</p>
+<p>改写前：</p>
+<p><img src="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/1503449-20181101212917359-896329173.png" alt="img"></p>
+<p>改写后：</p>
+<p><img src="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/1503449-20181101212933764-1735263839.png" alt="img"></p>
+<p>保存后，重启VS，键入#4，单击Tab即可。</p>
+<p>此外还可以使用快捷键自定义方法、函数等，很好用。</p>
+<h1 id="查看内存"><a href="#查看内存" class="headerlink" title="查看内存"></a>查看内存</h1><p>1.调试必须要在Debug状态下进行！<br>2.想要查看内存,局部变量等窗口的话，首先要确保在调试状态下（按F5或者按本地windows 调试器）进行，然后点击调试-》窗口-》内存即可；然后弹出一个窗口1，如下：<br><img src="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/20180406161328715" alt="这里写图片描述"><br>3.下面讲解怎么看这个内存：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">    int i &#x3D; 5;       (1)</span><br><span class="line">    int j &#x3D; 9;       (2)</span><br><span class="line">    int*p &#x3D; &amp;i;      (3)</span><br><span class="line">return 0;</span><br><span class="line">12345</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/20180406161027464" alt="这里写图片描述"><br>以上面这个程序为例，比较简单，只有当箭头运行到12行时候，才可以查看i,j,p,&amp;i,*p的内容，好的，现在开始讲了，假设现在已经运行到12行了，如果想要查看变量i的内容，把i复制到窗口1,看如下图片:</p>
+<p><img src="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/20180406161055396" alt="这里写图片描述"><br>然后按回车键，如下:<br><img src="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/20180406161641156" alt="这里写图片描述"></p>
+<p>就会出现i变量所对应的值0x00000005在窗口1，下面的第一行为0x00000005(i不是等于5嘛,这里把5当做地址传给i了,而事实上i的值为5,地址为&amp;i) , ?? ?? ?? ??,这里的0x00000005表示以窗口1中的值为地址，后面的值一般为此地址所对应的值，因为本题中不知道，所以为?? ?? ?? ??,下面以同样的方式来查看p:<br><img src="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/20180406161740870" alt="这里写图片描述"><br>可以看出p里面存放了一个地址值，窗口1下面所对应的两个值，很显然，左边这个值为p的值，就是一个地址，因为p为一个指针嘛，右面一个值就是这个地址所装的内容(其实就是指针p所指向的那块地址利里的内容!!)，即为5!</p>
+<h1 id="快捷更改"><a href="#快捷更改" class="headerlink" title="快捷更改"></a>快捷更改</h1><p>工具 &gt; 选项 &gt; 环境 &gt; 键盘，然后在右边的：显示命令包含下的输入框输入：编辑.行尾</p>
+<p>工具 &gt; 选项 &gt; 文本编辑器 &gt; C/C++ &gt; 代码样式 &gt; 格式设置 &gt; 新行</p>
+<h1 id="vs-code光标移动"><a href="#vs-code光标移动" class="headerlink" title="vs code光标移动"></a>vs code光标移动</h1><p>设置快捷键：</p>
+<p>打开命令面板，搜索 “打开键盘快捷方式” 然后执行，或者使用组合快捷键：<strong>先按Ctrl + k再按Ctrl + s</strong>，这时你将看到相对应的界面</p>
+<p>搜索光标cursor</p>
+<p><img src="/2021/01/01/%E9%85%8D%E7%BD%AE/vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3/image-20210427094450542.png" alt="image-20210427094450542"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/VS/" rel="tag"># VS</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/01/JAVA/jdk%E7%9B%B8%E5%85%B3/" rel="prev" title="jdk相关">
+      <i class="fa fa-chevron-left"></i> jdk相关
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/01/Linux/linux%E6%8A%80%E5%B7%A7/" rel="next" title="Linux技巧">
+      Linux技巧 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3"><span class="nav-number">1.</span> <span class="nav-text">vs操作相关</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E8%BF%87%E7%A8%8B"><span class="nav-number">1.2.</span> <span class="nav-text">实现过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8A%E6%9C%BA%E6%93%8D%E4%BD%9C"><span class="nav-number">1.3.</span> <span class="nav-text">上机操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%93%E5%BC%80%E5%B7%A5%E5%85%B7"><span class="nav-number">1.3.1.</span> <span class="nav-text">打开工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E5%85%A5%E4%BB%A3%E7%A0%81%E7%89%87%E6%AE%B5%E7%AE%A1%E7%90%86%E5%99%A8"><span class="nav-number">1.3.2.</span> <span class="nav-text">进入代码片段管理器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#vs%E6%93%8D%E4%BD%9C%E7%9B%B8%E5%85%B3-1"><span class="nav-number">1.3.3.</span> <span class="nav-text">vs操作相关</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E5%86%85%E5%AD%98"><span class="nav-number">2.</span> <span class="nav-text">查看内存</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BF%AB%E6%8D%B7%E6%9B%B4%E6%94%B9"><span class="nav-number">3.</span> <span class="nav-text">快捷更改</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#vs-code%E5%85%89%E6%A0%87%E7%A7%BB%E5%8A%A8"><span class="nav-number">4.</span> <span class="nav-text">vs code光标移动</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lemonforce</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonforce</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/three-waves.min.js"></script>
+    <script defer src="/lib/three/canvas_sphere.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'gzXD9zEDA40Tphr5SR3SdW1Q-gzGzoHsz',
+      appKey     : 'OhkBCtuVUlWsxS1Bm4jQVLgX',
+      placeholder: "有啥想说的，尽情留言",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>

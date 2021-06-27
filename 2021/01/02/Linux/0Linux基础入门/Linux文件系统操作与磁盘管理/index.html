@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"lemonforce.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="文件系统操作与磁盘管理Linux基础入门7 基本操作本节实验的文件系统操作的内容十分简单，只会包含几个命令的几个参数的讲解，但掌握这些也将对你在学习 Linux 和实验楼后续其他课程的过程中有极大帮助。  因为本课程的定位为入门基础，尽快上手，故没有打算涉及太多理论内容，前面省略了关于 Linux 文件系统的一些基本知识，也因为我们是在线实验环境，所以也避开了很少一部分但又十分重要的关于硬件的内容">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux文件系统操作与磁盘管理">
+<meta property="og:url" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/index.html">
+<meta property="og:site_name" content="lemonforce">
+<meta property="og:description" content="文件系统操作与磁盘管理Linux基础入门7 基本操作本节实验的文件系统操作的内容十分简单，只会包含几个命令的几个参数的讲解，但掌握这些也将对你在学习 Linux 和实验楼后续其他课程的过程中有极大帮助。  因为本课程的定位为入门基础，尽快上手，故没有打算涉及太多理论内容，前面省略了关于 Linux 文件系统的一些基本知识，也因为我们是在线实验环境，所以也避开了很少一部分但又十分重要的关于硬件的内容">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid600404labid6122timestamp1523871472488.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/7-2.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid600404labid6122timestamp1523871955863.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid600404labid6122timestamp1523872284604.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid735639labid62timestamp1532339776332.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid735639labid62timestamp1532339755321.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid735639labid62timestamp1532339693208.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid600404labid6122timestamp1523873459128.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid600404labid6122timestamp1523874300781.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid600404labid6122timestamp1523925358180.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/7-12.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/7-13.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/7-14.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/7-15.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/7-16.png">
+<meta property="og:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid735639labid62timestamp1532339794389.png">
+<meta property="article:published_time" content="2021-01-02T10:37:56.000Z">
+<meta property="article:modified_time" content="2021-01-02T11:57:48.583Z">
+<meta property="article:author" content="lemonforce">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="Linux基础入门">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid600404labid6122timestamp1523871472488.png">
+
+<link rel="canonical" href="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Linux文件系统操作与磁盘管理 | lemonforce</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">lemonforce</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://lemonforce.github.io/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="lemonforce">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lemonforce">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Linux文件系统操作与磁盘管理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2021-01-02 18:37:56 / 修改时间：19:57:48" itemprop="dateCreated datePublished" datetime="2021-01-02T18:37:56+08:00">2021-01-02</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%AD%A6%E4%B9%A0/" itemprop="url" rel="index"><span itemprop="name">学习</span></a>
+                </span>
+            </span>
+
+          
+            <span id="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/" class="post-meta-item leancloud_visitors" data-flag-title="Linux文件系统操作与磁盘管理" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/#valine-comments" itemprop="discussionUrl">
+      <span class="post-comments-count valine-comment-count" data-xid="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="文件系统操作与磁盘管理"><a href="#文件系统操作与磁盘管理" class="headerlink" title="文件系统操作与磁盘管理"></a>文件系统操作与磁盘管理</h1><p>Linux基础入门7</p>
+<h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><p>本节实验的文件系统操作的内容十分简单，只会包含几个命令的几个参数的讲解，但掌握这些也将对你在学习 Linux 和实验楼后续其他课程的过程中有极大帮助。</p>
+<blockquote>
+<p>因为本课程的定位为入门基础，尽快上手，故没有打算涉及太多理论内容，前面省略了关于 Linux 文件系统的一些基本知识，也因为我们是在线实验环境，所以也避开了很少一部分但又十分重要的关于硬件的内容，我们只能期待用户能够抱着提高自学能力的心态自己去补充相关的知识。</p>
+</blockquote>
+<h3 id="2-1-查看磁盘和目录的容量"><a href="#2-1-查看磁盘和目录的容量" class="headerlink" title="2.1 查看磁盘和目录的容量"></a>2.1 查看磁盘和目录的容量</h3><ul>
+<li>使用 <code>df</code> 命令查看磁盘的容量</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df</span><br></pre></td></tr></table></figure>
+<p>在实验楼的环境中你将看到如下的输出内容：</p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid600404labid6122timestamp1523871472488.png" alt="此处输入图片的描述"></p>
+<p>但在实际的物理主机上会更像这样：</p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/7-2.png" alt="1"></p>
+<p>物理主机上的 <code>/dev/sda2</code> 是对应着主机硬盘的分区，后面的数字表示分区号，数字前面的字母 a 表示第几块硬盘（也可能是可移动磁盘），你如果主机上有多块硬盘则可能还会出现 <code>/dev/sdb</code>，<code>/dev/sdc</code> 这些磁盘设备都会在 <code>/dev</code> 目录下以文件的存在形式。</p>
+<p>接着你还会看到”1k-块”这个陌生的东西，它表示以磁盘块大小的方式显示容量，后面为相应的以块大小表示的已用和可用容量，在你了解 Linux 的文件系统之前这个就先不管吧，我们以一种你应该看得懂的方式展示：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df -h</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid600404labid6122timestamp1523871955863.png" alt="此处输入图片的描述"></p>
+<p>现在你就可以使用命令查看你主机磁盘的使用情况了。至于挂载点如果你还记得前面第 4 节介绍 Linux 目录树结构的内容，那么你就应该能很好的理解挂载的概念，这里就不再赘述。</p>
+<ul>
+<li>使用 <code>du</code> 命令查看目录的容量</li>
+</ul>
+<p>这个命令前面其实已经用了很多次了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 默认同样以块的大小展示</span></span><br><span class="line">du</span><br><span class="line"><span class="comment"># 加上 `-h` 参数，以更易读的方式展示</span></span><br><span class="line">du -h</span><br></pre></td></tr></table></figure>
+<p><code>-d</code> 参数指定查看目录的深度</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 只查看 1 级目录的信息</span></span><br><span class="line">du -h -d 0 ~</span><br><span class="line"><span class="comment"># 查看 2 级</span></span><br><span class="line">du -h -d 1 ~</span><br></pre></td></tr></table></figure>
+<p>常用参数</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">du -h <span class="comment"># 同 --human-readable 以 K，M，G 为单位，提高信息的可读性。</span></span><br><span class="line">du -a <span class="comment"># 同 --all 显示目录中所有文件的大小。</span></span><br><span class="line">du -s <span class="comment"># 同 --summarize 仅显示总计，只列出最后加总的值。</span></span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid600404labid6122timestamp1523872284604.png" alt="此处输入图片的描述"></p>
+<p><code>du</code>（estimate file space usage）命令与 <code>df</code>（report file system disk space usage）命令只有一字之差，希望大家注意不要弄混淆了，你可以像我这样从 man 手册中获取命令的完整描述，记全称就不会搞混了。</p>
+<h2 id="简单的磁盘管理"><a href="#简单的磁盘管理" class="headerlink" title="简单的磁盘管理"></a>简单的磁盘管理</h2><p><strong>下面涉及的命令具有一定的危险性，操作不当可能会丢失你的个人数据，初学者建议在虚拟环境中进行操作。</strong></p>
+<p>通常情况下，这一小节应该直接讲如何挂载卸载磁盘，如何格式化磁盘，如何分区，但如你所见，由于实验环境的限制，环境中没有额外的磁盘可以挂载，也没有空闲空间测试分区命令，所以首先我们会先创建一个虚拟磁盘来进行后续的练习操作。</p>
+<h3 id="创建虚拟磁盘"><a href="#创建虚拟磁盘" class="headerlink" title="创建虚拟磁盘"></a>创建虚拟磁盘</h3><h4 id="dd-命令简介"><a href="#dd-命令简介" class="headerlink" title="dd 命令简介"></a>dd 命令简介</h4><p><code>dd</code> 命令用于转换和复制文件，不过它的复制不同于 <code>cp</code>。之前提到过关于 Linux 的很重要的一点，<strong>一切即文件</strong>，在 Linux 上，硬件的设备驱动（如硬盘）和特殊设备文件（如 <code>/dev/zero</code> 和 <code>/dev/random</code>）都像普通文件一样，只是在各自的驱动程序中实现了对应的功能，<code>dd</code> 也可以读取文件或写入这些文件。这样，<code>dd</code> 也可以用在备份硬件的引导扇区、获取一定数量的随机数据或者空数据等任务中。<code>dd</code> 程序也可以在复制时处理数据，例如转换字节序、或在 ASCII 与 EBCDIC 编码间互换。</p>
+<p><code>dd</code> 的命令行语句与其他的 Linux 程序不同，因为它的命令行选项格式为 <strong>选项=值</strong>，而不是更标准的 <strong>–选项 值</strong> 或 <strong>-选项=值</strong>。<code>dd</code> 默认从标准输入中读取，并写入到标准输出中，但可以用选项 <code>if</code>（input file，输入文件）和 <code>of</code>（output file，输出文件）改变。</p>
+<p>我们先来试试用 <code>dd</code> 命令从标准输入读入用户的输入到标准输出或者一个文件中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 输出到文件</span></span><br><span class="line">dd of=<span class="built_in">test</span> bs=10 count=1 <span class="comment"># 或者 dd if=/dev/stdin of=test bs=10 count=1</span></span><br><span class="line"><span class="comment"># 输出到标准输出</span></span><br><span class="line">dd <span class="keyword">if</span>=/dev/stdin of=/dev/stdout bs=10 count=1</span><br><span class="line"><span class="comment"># 在打完了这个命令后，继续在终端打字，作为你的输入</span></span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid735639labid62timestamp1532339776332.png" alt="此处输入图片的描述"></p>
+<p>上述命令从标准输入设备读入用户输入（缺省值，所以可省略）然后输出到 test 文件，<code>bs</code>（block size）用于指定块大小（缺省单位为 Byte，也可为其指定如 <code>K</code>，<code>M</code>，<code>G</code> 等单位），<code>count</code> 用于指定块数量。如上图所示，我指定只读取总共 10 个字节的数据，当我输入了 <code>hello shiyanlou</code> 之后加上空格回车总共 16 个字节（一个英文字符占一个字节）内容，显然超过了设定大小。使用 <code>du</code> 和 <code>cat</code> 10 个字节（那个黑底百分号表示这里没有换行符），而其他的多余输入将被截取并保留在标准输入。</p>
+<p>前面说到 <code>dd</code> 在拷贝的同时还可以实现数据转换，那下面就举一个简单的例子：将输出的英文字符转换为大写再写入文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dd <span class="keyword">if</span>=/dev/stdin of=<span class="built_in">test</span> bs=10 count=1 conv=ucase</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid735639labid62timestamp1532339755321.png" alt="此处输入图片的描述"></p>
+<p>你可以在<code>man</code>文档中查看其他所有转换参数。</p>
+<h4 id="使用-dd-命令创建虚拟镜像文件"><a href="#使用-dd-命令创建虚拟镜像文件" class="headerlink" title="使用 dd 命令创建虚拟镜像文件"></a>使用 dd 命令创建虚拟镜像文件</h4><p>通过上面一小节，你应该掌握了 <code>dd</code> 的基本使用，下面就来使用 <code>dd</code> 命令来完成创建虚拟磁盘的第一步。</p>
+<p>从 <code>/dev/zero</code> 设备创建一个容量为 256M 的空文件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">dd <span class="keyword">if</span>=/dev/zero of=virtual.img bs=1M count=256</span><br><span class="line">du -h virtual.img</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid735639labid62timestamp1532339693208.png" alt="此处输入图片的描述"></p>
+<p>然后我们要将这个文件格式化（写入文件系统），这里我们要学到一个（准确的说是一组）新的命令来完成这个需求。</p>
+<h4 id="使用-mkfs-命令格式化磁盘（我们这里是自己创建的虚拟磁盘镜像）"><a href="#使用-mkfs-命令格式化磁盘（我们这里是自己创建的虚拟磁盘镜像）" class="headerlink" title="使用 mkfs 命令格式化磁盘（我们这里是自己创建的虚拟磁盘镜像）"></a>使用 mkfs 命令格式化磁盘（我们这里是自己创建的虚拟磁盘镜像）</h4><p>你可以在命令行输入 <code>sudo mkfs</code> 然后按下 <code>&lt;Tab&gt;</code> 键，你可以看到很多个以 mkfs 为前缀的命令，这些不同的后缀其实就是表示着不同的文件系统，可以用 mkfs 格式化成的文件系统。</p>
+<p>我们可以简单的使用下面的命令来将我们的虚拟磁盘镜像格式化为 <code>ext4</code> 文件系统：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mkfs.ext4 virtual.img</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid600404labid6122timestamp1523873459128.png" alt="此处输入图片的描述"></p>
+<p>可以看到实际 <code>mkfs.ext4</code> 是使用 <code>mke2fs</code> 来完成格式化工作的。<code>mke2fs</code> 的参数很多，不过我们也不会经常格式化磁盘来玩，所以就掌握这基本用法吧，等你有特殊需求时，再查看 man 文档解决。</p>
+<p>更多关于文件系统的知识，请查看 wiki： <a target="_blank" rel="noopener" href="http://zh.wikipedia.org/wiki/%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F#Linux_.E6.94.AF.E6.8F.B4.E7.9A.84.E6.AA.94.E6.A1.88.E7.B3.BB.E7.B5.B1">文件系统</a> <a target="_blank" rel="noopener" href="http://zh.wikipedia.org/wiki/Ext3">ext3</a>，<a target="_blank" rel="noopener" href="http://zh.wikipedia.org/wiki/Ext4">ext4</a></p>
+<p>如果你想知道 Linux 支持哪些文件系统你可以输入 <code>ls -l /lib/modules/$(uname -r)/kernel/fs</code> 查看（我们的环境中无法查看）。</p>
+<h4 id="使用-mount-命令挂载磁盘到目录树"><a href="#使用-mount-命令挂载磁盘到目录树" class="headerlink" title="使用 mount 命令挂载磁盘到目录树"></a>使用 mount 命令挂载磁盘到目录树</h4><p>用户在 Linux/UNIX 的机器上打开一个文件以前，包含该文件的文件系统必须先进行挂载的动作，此时用户要对该文件系统执行 <code>mount</code> 的指令以进行挂载。该指令通常是使用在 USB 或其他可移除存储设备上，而根目录则需要始终保持挂载的状态。又因为 Linux/UNIX 文件系统可以对应一个文件而不一定要是硬件设备，所以可以挂载一个包含文件系统的文件到目录树。</p>
+<p>Linux/UNIX 命令行的 <code>mount</code> 指令是告诉操作系统，对应的文件系统已经准备好，可以使用了，而该文件系统会对应到一个特定的点（称为挂载点）。挂载好的文件、目录、设备以及特殊文件即可提供用户使用。</p>
+<p>我们先来使用 <code>mount</code> 来查看下主机已经挂载的文件系统：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo mount</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid600404labid6122timestamp1523874300781.png" alt="此处输入图片的描述"></p>
+<p>输出的结果中每一行表示一个设备或虚拟设备，每一行最前面是设备名，然后是 on 后面是挂载点，type 后面表示文件系统类型，再后面是挂载选项（比如可以在挂载时设定以只读方式挂载等等）。</p>
+<p>那么我们如何挂载真正的磁盘到目录树呢，<code>mount</code> 命令的一般格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount [options] [<span class="built_in">source</span>] [directory]</span><br></pre></td></tr></table></figure>
+<p>一些常用操作：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mount [-o [操作选项]] [-t 文件系统类型] [-w|--rw|--ro] [文件系统源] [挂载点]</span><br></pre></td></tr></table></figure>
+<p><strong>注意：由于实验楼的环境限制，mount 命令挂载及 umount 卸载都无法进行操作，可以简单了解这些步骤。</strong></p>
+<p>现在直接来挂载我们创建的虚拟磁盘镜像到 <code>/mnt</code> 目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">mount -o loop -t ext4 virtual.img /mnt</span><br><span class="line"><span class="comment"># 也可以省略挂载类型，很多时候 mount 会自动识别</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 以只读方式挂载</span></span><br><span class="line">mount -o loop --ro virtual.img /mnt</span><br><span class="line"><span class="comment"># 或者 mount -o loop,ro virtual.img /mnt</span></span><br></pre></td></tr></table></figure>
+<h4 id="使用-umount-命令卸载已挂载磁盘"><a href="#使用-umount-命令卸载已挂载磁盘" class="headerlink" title="使用 umount 命令卸载已挂载磁盘"></a>使用 umount 命令卸载已挂载磁盘</h4><p><strong>注意：由于实验楼的环境限制，mount 命令挂载及 umount 卸载都无法进行操作，可以简单了解这些步骤。</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 命令格式 sudo umount 已挂载设备名或者挂载点，如：</span></span><br><span class="line">sudo umount /mnt</span><br></pre></td></tr></table></figure>
+<p>不过遗憾的是，由于我们环境的问题（环境中使用的 Linux 内核在编译时没有添加对 Loop device 的支持），所以你将无法挂载成功：</p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid600404labid6122timestamp1523925358180.png" alt="此处输入图片的描述"></p>
+<p>另外关于 loop 设备，你可能会有诸多疑问，那么请看下面来自维基百科 <a target="_blank" rel="noopener" href="http://zh.wikipedia.org/wiki//dev/loop">/dev/loop</a>的说明：</p>
+<blockquote>
+<p>在类 UNIX 系统中，/dev/loop（或称 vnd （vnode disk）、lofi（循环文件接口））是一种伪设备，这种设备使得文件可以如同块设备一般被访问。</p>
+<p>在使用之前，循环设备必须与现存文件系统上的文件相关联。这种关联将提供给用户一个应用程序接口，接口将允许文件视为块特殊文件（参见设备文件系统）使用。因此，如果文件中包含一个完整的文件系统，那么这个文件就能如同磁盘设备一般被挂载。</p>
+<p>这种设备文件经常被用于光盘或是磁盘镜像。通过循环挂载来挂载包含文件系统的文件，便使处在这个文件系统中的文件得以被访问。这些文件将出现在挂载点目录。如果挂载目录中本身有文件，这些文件在挂载后将被禁止使用。</p>
+</blockquote>
+<h4 id="使用-fdisk-为磁盘分区"><a href="#使用-fdisk-为磁盘分区" class="headerlink" title="使用 fdisk 为磁盘分区"></a>使用 fdisk 为磁盘分区</h4><p>（关于分区的一些概念不清楚的用户请参看 <a target="_blank" rel="noopener" href="http://zh.wikipedia.org/wiki/%E4%B8%BB%E5%BC%95%E5%AF%BC%E8%AE%B0%E5%BD%95">主引导记录</a>）</p>
+<p><strong>注意：由于实验楼的环境限制，fdisk 命令无法进行操作，可以简单了解这些步骤。</strong></p>
+<p>同样因为环境中没有物理磁盘，也无法创建虚拟磁盘的原因我们就无法实验练习使用该命令了，下面我将以我的物理主机为例讲解如何为磁盘分区。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看硬盘分区表信息</span></span><br><span class="line">sudo fdisk -l</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/7-12.png" alt="1"></p>
+<p>输出结果中开头显示了我主机上的磁盘的一些信息，包括容量扇区数，扇区大小，I/O 大小等信息。</p>
+<p>我们重点看一下中间的分区信息，<code>/dev/sda1</code>，<code>/dev/sda2</code> 为主分区分别安装了 Windows 和 Linux 操作系统，<code>/dev/sda3</code> 为交换分区（可以理解为虚拟内存），<code>/dev/sda4</code> 为扩展分区其中包含 <code>/dev/sda5</code>，<code>/dev/sda6</code>，<code>/dev/sda7</code>，<code>/dev/sda8</code> 四个逻辑分区，因为主机上有几个分区之间有空隙，没有对齐边界扇区，所以分区之间不是完全连续的。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 进入磁盘分区模式</span></span><br><span class="line">sudo fdisk virtual.img</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/7-13.png" alt="1"></p>
+<p>在进行操作前我们首先应先规划好我们的分区方案，这里我将在使用 128M（可用 127M 左右）的虚拟磁盘镜像创建一个 30M 的主分区剩余部分为扩展分区包含 2 个大约 45M 的逻辑分区。</p>
+<p>操作完成后输入 <code>p</code> 查看结果如下:</p>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/7-14.png" alt="1"></p>
+<p>最后不要忘记输入 <code>w</code> 写入分区表。</p>
+<h4 id="使用-losetup-命令建立镜像与回环设备的关联"><a href="#使用-losetup-命令建立镜像与回环设备的关联" class="headerlink" title="使用 losetup 命令建立镜像与回环设备的关联"></a>使用 losetup 命令建立镜像与回环设备的关联</h4><p><strong>注意：由于实验楼的环境限制，losetup 命令无法进行操作，可以简单了解这些步骤。</strong></p>
+<p>同样因为环境原因中没有物理磁盘，也没有 loop device 的原因我们就无法实验练习使用该命令了，下面我将以我的物理主机为例讲解。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo losetup /dev/loop0 virtual.img</span><br><span class="line"><span class="comment"># 如果提示设备忙你也可以使用其它的回环设备，&quot;ls /dev/loop*&quot;参看所有回环设备</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 解除设备关联</span></span><br><span class="line">sudo losetup -d /dev/loop0</span><br></pre></td></tr></table></figure>
+<p>然后再使用 <code>mkfs</code> 格式化各分区（前面我们是格式化整个虚拟磁盘镜像文件或磁盘），不过格式化之前，我们还要为各分区建立虚拟设备的映射，用到 <code>kpartx</code> 工具，需要先安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo apt-get install kpartx</span><br><span class="line">sudo kpartx -av /dev/loop0</span><br><span class="line"></span><br><span class="line"><span class="comment"># 取消映射</span></span><br><span class="line">sudo kpartx -dv /dev/loop0</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/7-15.png" alt="pic"></p>
+<p>接着再是格式化，我们将其全部格式化为 ext4：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo mkfs.ext4 -q /dev/mapper/loop0p1</span><br><span class="line">sudo mkfs.ext4 -q /dev/mapper/loop0p5</span><br><span class="line">sudo mkfs.ext4 -q /dev/mapper/loop0p6</span><br></pre></td></tr></table></figure>
+<p>格式化完成后在 <code>/media</code> 目录下新建四个空目录用于挂载虚拟磁盘：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /media/virtualdisk_&#123;1..3&#125;</span><br><span class="line"><span class="comment"># 挂载磁盘分区</span></span><br><span class="line">sudo mount /dev/mapper/loop0p1 /media/virtualdisk_1</span><br><span class="line">sudo mount /dev/mapper/loop0p5 /media/virtualdisk_2</span><br><span class="line">sudo mount /dev/mapper/loop0p6 /media/virtualdisk_3</span><br><span class="line"></span><br><span class="line"><span class="comment"># 卸载磁盘分区</span></span><br><span class="line">sudo umount /dev/mapper/loop0p1</span><br><span class="line">sudo umount /dev/mapper/loop0p5</span><br><span class="line">sudo umount /dev/mapper/loop0p6</span><br></pre></td></tr></table></figure>
+<p>然后：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df -h</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/7-16.png" alt="pic"></p>
+<h4 id="轻松一下"><a href="#轻松一下" class="headerlink" title="轻松一下"></a>轻松一下</h4><p><code>cowsay</code> 命令，可以让你在终端里以一种动物说话的形式打印出一段话。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 更新软件包</span></span><br><span class="line">sudo apt update</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装</span></span><br><span class="line">sudo apt install -y cowsay</span><br><span class="line"></span><br><span class="line"><span class="comment"># 默认是一只牛</span></span><br><span class="line">cowsay hello shiyanlou</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加上&#x27;-l&#x27;参数打印所有支持的动物（其实不只是动物）种类</span></span><br><span class="line">cowsay -l</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用&#x27;-f&#x27;参数选择动物种类</span></span><br><span class="line">cowsay -f elephant hello shiyanlou</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装 fortune-zh</span></span><br><span class="line">sudo apt-get install fortune-zh</span><br><span class="line"></span><br><span class="line"><span class="comment"># 此外它还可以结合我们之前的作业讲过的 fortune 命令一起使用</span></span><br><span class="line">/usr/games/fortune | cowsay -f daemon</span><br></pre></td></tr></table></figure>
+<p><img src="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86/document-uid735639labid62timestamp1532339794389.png" alt="此处输入图片的描述"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/" rel="tag"># Linux基础入门</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E6%96%87%E4%BB%B6%E6%89%93%E5%8C%85%E4%B8%8E%E8%A7%A3%E5%8E%8B%E7%BC%A9/" rel="prev" title="Linux文件打包与解压缩">
+      <i class="fa fa-chevron-left"></i> Linux文件打包与解压缩
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/02/Linux/0Linux%E5%9F%BA%E7%A1%80%E5%85%A5%E9%97%A8/Linux%E4%B8%8B%E7%9A%84%E5%B8%AE%E5%8A%A9%E5%91%BD%E4%BB%A4/" rel="next" title="Linux下的帮助命令">
+      Linux下的帮助命令 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    <div class="comments" id="valine-comments"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%B3%BB%E7%BB%9F%E6%93%8D%E4%BD%9C%E4%B8%8E%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86"><span class="nav-number">1.</span> <span class="nav-text">文件系统操作与磁盘管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">1.1.</span> <span class="nav-text">基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E6%9F%A5%E7%9C%8B%E7%A3%81%E7%9B%98%E5%92%8C%E7%9B%AE%E5%BD%95%E7%9A%84%E5%AE%B9%E9%87%8F"><span class="nav-number">1.1.1.</span> <span class="nav-text">2.1 查看磁盘和目录的容量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E7%9A%84%E7%A3%81%E7%9B%98%E7%AE%A1%E7%90%86"><span class="nav-number">1.2.</span> <span class="nav-text">简单的磁盘管理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%99%9A%E6%8B%9F%E7%A3%81%E7%9B%98"><span class="nav-number">1.2.1.</span> <span class="nav-text">创建虚拟磁盘</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#dd-%E5%91%BD%E4%BB%A4%E7%AE%80%E4%BB%8B"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">dd 命令简介</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-dd-%E5%91%BD%E4%BB%A4%E5%88%9B%E5%BB%BA%E8%99%9A%E6%8B%9F%E9%95%9C%E5%83%8F%E6%96%87%E4%BB%B6"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">使用 dd 命令创建虚拟镜像文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-mkfs-%E5%91%BD%E4%BB%A4%E6%A0%BC%E5%BC%8F%E5%8C%96%E7%A3%81%E7%9B%98%EF%BC%88%E6%88%91%E4%BB%AC%E8%BF%99%E9%87%8C%E6%98%AF%E8%87%AA%E5%B7%B1%E5%88%9B%E5%BB%BA%E7%9A%84%E8%99%9A%E6%8B%9F%E7%A3%81%E7%9B%98%E9%95%9C%E5%83%8F%EF%BC%89"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">使用 mkfs 命令格式化磁盘（我们这里是自己创建的虚拟磁盘镜像）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-mount-%E5%91%BD%E4%BB%A4%E6%8C%82%E8%BD%BD%E7%A3%81%E7%9B%98%E5%88%B0%E7%9B%AE%E5%BD%95%E6%A0%91"><span class="nav-number">1.2.1.4.</span> <span class="nav-text">使用 mount 命令挂载磁盘到目录树</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-umount-%E5%91%BD%E4%BB%A4%E5%8D%B8%E8%BD%BD%E5%B7%B2%E6%8C%82%E8%BD%BD%E7%A3%81%E7%9B%98"><span class="nav-number">1.2.1.5.</span> <span class="nav-text">使用 umount 命令卸载已挂载磁盘</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-fdisk-%E4%B8%BA%E7%A3%81%E7%9B%98%E5%88%86%E5%8C%BA"><span class="nav-number">1.2.1.6.</span> <span class="nav-text">使用 fdisk 为磁盘分区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-losetup-%E5%91%BD%E4%BB%A4%E5%BB%BA%E7%AB%8B%E9%95%9C%E5%83%8F%E4%B8%8E%E5%9B%9E%E7%8E%AF%E8%AE%BE%E5%A4%87%E7%9A%84%E5%85%B3%E8%81%94"><span class="nav-number">1.2.1.7.</span> <span class="nav-text">使用 losetup 命令建立镜像与回环设备的关联</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%BD%BB%E6%9D%BE%E4%B8%80%E4%B8%8B"><span class="nav-number">1.2.1.8.</span> <span class="nav-text">轻松一下</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">lemonforce</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">40</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">lemonforce</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script color='' opacity='' zIndex='' count='' src="/lib/canvas-nest/canvas-nest-nomobile.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+  <script defer src="/lib/three/three.min.js"></script>
+    <script defer src="/lib/three/three-waves.min.js"></script>
+    <script defer src="/lib/three/canvas_sphere.min.js"></script>
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+
+<script>
+NexT.utils.loadComments(document.querySelector('#valine-comments'), () => {
+  NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+    var GUEST = ['nick', 'mail', 'link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(item => {
+      return GUEST.includes(item);
+    });
+    new Valine({
+      el         : '#valine-comments',
+      verify     : false,
+      notify     : false,
+      appId      : 'gzXD9zEDA40Tphr5SR3SdW1Q-gzGzoHsz',
+      appKey     : 'OhkBCtuVUlWsxS1Bm4jQVLgX',
+      placeholder: "有啥想说的，尽情留言",
+      avatar     : 'mm',
+      meta       : guest,
+      pageSize   : '10' || 10,
+      visitor    : true,
+      lang       : 'zh-cn' || 'zh-cn',
+      path       : location.pathname,
+      recordIP   : false,
+      serverURLs : ''
+    });
+  }, window.Valine);
+});
+</script>
+
+</body>
+</html>
